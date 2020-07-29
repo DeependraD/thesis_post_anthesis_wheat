@@ -1,0 +1,576 @@
+
+```{r model-yield-setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(tidy = TRUE, cache = TRUE, 
+                      echo = FALSE, 
+                      tidy.opts = list(width.cutoff=50), 
+                      eval = TRUE, fig.pos = "H",
+                      fig.align = "center", 
+                      fig.asp = 0.7)
+```
+
+Observed response variables are summarised under three major aspects of a crop trait-- Yield and yield component traits, Leaf health traits and Crop morphological, phenological and architectural traits.
+
+## Modeling yield and yield component traits
+
+```{r load-set-go1}
+load("04.1-modeling_of_yield1.RData")
+
+# # image format has proper label information for factors
+# all_data <- read_csv("../data/all_data.csv")
+# checks_data <- read_csv("../data/checks_data.csv")
+```
+
+<!-- ### Visualization of yield and yield component traits -->
+
+<!-- ```{r yield-n-comp-viz, fig.cap="Yield and yield component traits versus superimposed blocks factor", fig.subcap=c("Yield", "Panicle length"), fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold"} -->
+
+<!-- stringr::str_subset(colnames(all_data), "yield7") %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup),  -->
+<!--                         y = get(.x)), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab("Yield"))) # for multiple plots use `paste` -->
+
+<!-- stringr::str_subset(colnames(all_data), "effective_tiller7") %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup), # block -->
+<!--                         y = get(.x)), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab("Number of effective tillers"))) -->
+<!-- ``` -->
+
+
+<!-- ```{r yield-n-comp-viz2, fig.cap="Yield and yield component traits versus superimposed blocks factor (...continued)", fig.subcap=c("Thousand kernel weight", "Number of grains per panicle", "Number of effective tillers"), fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold"} -->
+
+<!-- stringr::str_subset(colnames(all_data), "thou_grain_wt7") %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup), # block -->
+<!--                         y = get(.x)), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab("Thousand kernel weight"))) -->
+
+<!-- stringr::str_subset(colnames(all_data), "grain_per_pan7") %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup), # block -->
+<!--                         y = get(.x)), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab("Grains per panicle"))) -->
+
+<!-- stringr::str_subset(colnames(all_data), "panicle_len7") %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup), # block -->
+<!--                         y = get(.x)), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab("Panicle length"))) -->
+<!-- ``` -->
+
+<!-- ### Mixed modeling yield and yield component traits -->
+
+```{r yield-model, eval=TRUE, echo=FALSE}
+# # # Fixed effects model of yield and yield component traits
+# # model_yield <- purrr::map(.x = paste(c("yield", 
+# #                                        "effective_tiller", "thou_grain_wt", 
+# #                                        "grain_per_pan", "panicle_len"), "7", sep = ""), 
+# #                           .f = ~ lm(get(.x) ~ 
+# #                                       rowgroup + colgroup +
+# #                                       col %in% colgroup + 
+# #                                       row %in% rowgroup + 
+# #                                       interaction(rowgroup, colgroup) + 
+# #                                       lin_check,
+# #                                     data = all_data))
+# 
+# # # Fixed effects checks and random intercept effects fit for line genotypes and design factors
+# model_yield <- purrr::map(.x = paste(c("yield", 
+#                                        "effective_tiller", "thou_grain_wt", 
+#                                        "grain_per_pan", "panicle_len"), "7", sep = ""), 
+#                           .f = ~ lme4::lmer(get(.x) ~ 
+#                             (1 | rowgroup) +
+#                             (1 | colgroup) +
+#                             (1 | row:rowgroup) +
+#                             (1 | col:colgroup) +
+#                             (1 | interaction_rc) +
+#                             (1 | line_or_check) + check_or_line, # correct model
+#                             # (1 | line_or_check:conv) + check_or_line, # same as above
+#                             # (1 | line_or_check:conv) + check_or_line + conf + # rank deficient
+#                             # (1 | line_or_check:conv) + check_or_line:conf + conf + # rank deficient
+#                           data = all_data)) %>% 
+#   set_names(nm = c("Yield", "Effective tillers", "Thousand kernel weight", 
+#                    "Grains per panicle", "Panicle length"))
+# 
+# anova_yield <- purrr::map(.x = model_yield, 
+#                           .f = ~ anova(.x)) %>% 
+#   set_names(nm = c("Yield",  "Effective tillers", 
+#                    "Thousand kernel weight", 
+#                    "Grains per panicle", 
+#                    "Panicle length"))
+
+# save(list = setdiff(ls(all.names = FALSE), to_diff), 
+#      file = "04.1-modeling_of_yield2.RData", 
+#      envir = .GlobalEnv)
+load("04.1-modeling_of_yield2.RData")
+```
+
+
+### Model estimates of yield and yield component traits
+
+```{r yield-fitted-vs-observed-tab, results = 'asis', eval=TRUE, echo=FALSE}
+
+# # BLUPs/fitted values
+fitted_yield <- map2(.x = model_yield, .y = c("yield", "effective_tiller", "thou_grain_wt", 
+                                              "grain_per_pan", "panicle_len"), 
+                     ~ predict(.x) %>% 
+                       enframe(name = "Genotype", value = paste(.y, "fitted")))
+
+# # tidying BLUPs
+fitted_yield <- full_join(fitted_yield[[1]], fitted_yield[[2]], by = "Genotype") %>% 
+  full_join(fitted_yield[[3]], by = "Genotype") %>% 
+  full_join(fitted_yield[[4]], by = "Genotype") %>% 
+  full_join(fitted_yield[[5]], by = "Genotype") %>% 
+  mutate(Genotype = as.numeric(Genotype)) %>% 
+  arrange(Genotype)
+
+# fitted_yield <- all_data[,c(c("row", "col", 
+#                               "rowgroup", "colgroup", "lin_check"), 
+#                             c("yield7", "effective_tiller7", "panicle_len7", 
+#                               "thou_grain_wt7", "grain_per_pan7"))] %>%
+#   bind_cols(fitted_yield)
+
+all_data %>% 
+  select(Genotype, 
+         `encoding` = `lin_check`, 
+         `Yield` = `yield7`, 
+         `Effective tillers` = `effective_tiller7`,
+         `Thousand kernel weight` = `thou_grain_wt7`, 
+         `Grain per panicle` = `grain_per_pan7`, 
+         `Panicle length` = `panicle_len7`) %>% 
+  group_by(encoding, Genotype) %>%
+  summarise_if(is.numeric, function(x)mean(x, na.rm = TRUE)) %>%
+  ungroup() %>%
+  knitr::kable(format = "latex",
+               caption = "Model adjusted genotypic mean responses of yield and yield component traits",
+               booktabs = T, linesep = "",
+               align = "c",
+               longtable = TRUE) %>%
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position", "repeat_header"),
+                            full_width = FALSE, font_size = 8) %>%
+  kableExtra::column_spec(column = 1, width = "2cm") %>%
+  kableExtra::column_spec(column = 2, width = "5.5cm") %>%
+  kableExtra::column_spec(column = 3:7, width = "2cm") %>%
+  kableExtra::landscape()
+
+```
+
+
+\blandscape
+
+### Mixed model summary of fixed effects terms of yield and yield component traits
+
+```{r yield-model-summary-tab, results="asis", echo=FALSE}
+
+# # must use this function with float=FALSE in stargazer
+long_stargazer <- function(...){
+  output <- capture.output(stargazer::stargazer(...))
+  # The lines 4 and second last lines are the ones we want to remove...
+  output[c(4, length(output)-1)] <- output[c(4, length(output)-1)] %>% 
+    stringr::str_replace("tabular", "longtable")
+  # cat out the results - this is essentially just what stargazer does too
+  cat(paste(output, collapse = "\n"), "\n")
+}
+
+# # function is to trick stargazer to use false set of coefficients
+# # unfortunately the significance symbol behaves wrong
+# response_replace_fun <- function(x, y){
+#   cofx <- coef(x);
+#   cofx[names(cofx) %>% 
+#          str_detect("lin_check")] <- y[!is.nan(y)][-1];
+#   return(cofx)
+# }
+# 
+# response_replace_init <- fitted_fixed_all %>% 
+#   select(contains("fitted"), "lin_check") %>% 
+#   group_by(lin_check) %>% 
+#   summarise_if(is.numeric, function(x)mean(x, na.rm = TRUE)) %>% 
+#   ungroup() %>% 
+#   select(-lin_check)
+# 
+# response_replace_coef <- map2(yield_and_comp_traits_fixed, 
+#                               response_replace_init,
+#                              response_replace_fun)
+  
+long_stargazer(model_yield[1:5], type = "latex", 
+               title = "Model summary of yield and yield component trait responses", 
+               style = "all", digits = 2, header = FALSE, font.size = "small", 
+               column.labels = c("Yield", "\\parbox[t]{2.5cm}{Number of effective tillers}",
+                                 "\\parbox[t]{2.5cm}{Thousand kernel weight}", 
+                                 "\\parbox[t]{2.5cm}{Grains per panicle}",
+                                 "Panicle length"), 
+               model.names = TRUE, dep.var.labels.include = FALSE,
+               keep = c("check_or_line\\d", "Constant"), report = "vc*sp",
+               covariate.labels = c("Bhrikuti", "Gautam", 
+                                    "Tilottama", "Aditaya (Constant)"),
+               # coef = response_replace_coef[c(1, 2, 3)],
+               single.row = TRUE, df = FALSE, omit.stat = c("adj.rsq"),
+               column.sep.width = "1pt", float = FALSE)
+
+```
+
+
+\elandscape
+
+<!-- ### ANOVA table of fixed effects terms of yield and yield component traits -->
+
+<!-- ```{r yield-anova-tabs, results="asis"} -->
+<!-- # # if ANOVA tables are to be printed, changing attribute called "heading" would generate tables with correct names of repsonses. -->
+
+<!-- # # grabbing attribute -->
+<!-- # attr(anova(model_yield[[1]]), which = "heading") %>% -->
+<!-- #   as_tibble() %>% -->
+<!-- #   filter(!row_number() == which(grepl(pattern = "Response", -->
+<!-- #                                       x = ., ignore.case = TRUE))) -->
+
+<!-- # # automated attribute changing generates new list, gotta assign to object -->
+<!-- anova_yield <- pmap(list(model_yield,  -->
+<!--                     paste("ANOVA Table of", c("Yield", "Number of effective tillers",  -->
+<!--                       "Thousand kernel weight", "Number of grains per panicle", "Panicle length"))),  -->
+<!--                     .f = function(x, y) {x <- anova(x);  -->
+<!--                       attr(x, which = "heading") <-  y;  -->
+<!--                       return(x)}) -->
+
+<!-- walk2(.x = anova_yield,  -->
+<!--       .y = c("ANOVA of response variable yield",  -->
+<!--              "ANOVA of response variable number of effective tillers per square meter",  -->
+<!--              "ANOVA of response variable thousand kernel weight",  -->
+<!--              "ANOVA of response variable number of grains per panicle",  -->
+<!--              "ANOVA of response variable panicle length"),  -->
+<!--       ~ print(.x %>% -->
+<!--         knitr::kable(format = "latex",  -->
+<!--                      caption = .y,  -->
+<!--                      booktabs = T, linesep = "",  -->
+<!--                      align = "c") %>%  -->
+<!--         kableExtra::kable_styling(position = "center", -->
+<!--                                   latex_options = c("HOLD_position"), -->
+<!--                                   full_width = FALSE) %>% -->
+<!--         kableExtra::column_spec(column = 0, bold = TRUE))) -->
+<!-- ``` -->
+
+#### Yield
+
+Genotypes show highly significant differences for the yield trait. The model with both genotypes (checks and entries) outperforms in comparison to the one without in predicting the real yield ($\chi^2 = 14.4$ with $df = 4$). 
+
+Pairwise comparison of fixed effects estimate indicate that check variety Aditya has the lowest yield amongst all varieties while other have similar yields. Average yield of the lowest yielder is $4.53\ tons\ ha^{-1}\ (\pm\ 0.60)$ and Bhrikuti yields the highest with average yield of $5.04\ tons\ ha^{-1}\ (\pm\ 0.60)$.
+
+Similarly, entry genotypes show considerable amount of heritable variation as evident from a large measure of variance in random effects term. ANOVA table (\@ref(tab:lrt-yield)) and the dotplot (Figure \@ref(fig:yield-dotplot1)) showing random effects estimates of the entry genotypes illustrate the relationship. Blocking structure, however, do not result in improvement of the effect estimates of the genotypes; blocking factors do not have significant effect on the yield trait. 
+
+```{r yield-meanconf-tab, results='asis'}
+# # Produces Differences of Least Squares Means (population means) table with p-values and Confidence intervals.
+yield_diffmean <- map(.x = model_yield,
+                      .f = ~ lmerTest::difflsmeans(as_lmerModLmerTest(.x), adjust = "tukey") %>%
+                        as_tibble(rownames = "Contrast"))
+
+yield_diffmean[[1]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Yield of check varieties (post-hoc comparison using Tukey procedure)",
+                     booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+
+# # anova table of class merMod
+# lmerTest::anova(yield_mixed, ddf="lme4")
+```
+
+
+#### Number of effective tillers
+
+Genotypes show highly significant differences for the Number of effective tillers trait. LRT shows that both checks and entries possess heritable variation that could potentially be exploited in further selection of the germplasm. The model comparison indicates a lower BIC value and $\chi^2$ statistic of $35.2$ with $4\ df$. 
+
+Pairwise comparison of fixed effects estimate indicate that except for Aditya and Gautam varieties, which are similar in Number of effective tillers, all other check varieties differ for the trait. Highest number of effective tillers was found in Tilottama ($33.73\ \pm\ 2.46$) and the least in Aditya ($26.80\ \pm\ 2.45$) varieties.
+
+In contrast, entry genotypes are not significantly different for the variability they contribute in the number of effective tillers. This can be seen as small spread in genotype estimates of the random effects term. ANOVA table (\@ref(tab:lrt-netill)) and the dotplot (Figure \@ref(fig:yield-dotplot2)) showing random effects estimates of the entry genotypes illustrate the relationship. None of the blocking components might add to the benefit of improving the estimates of the genotypic effects for the number of effective tillers trait (based on LRT).
+
+```{r yield-meanconf-tab2, results='asis'}
+yield_diffmean[[2]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Number of effective tillers of check varieties (post-hoc comparison using Tukey procedure)",
+                     booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Thousand kernel weight
+
+Genotypes are significantly different (at $p = 0.05$) for the Thousand kernel weight trait. LRT shows that trait variation has the genetic roots linked to the genotype (for both checks and entries). Relative advantage of including genotype in the model terms is also highlighted by a lower BIC value and $\chi^2$ statistic of $10.279$ with $4\ df$. 
+
+Pairwise comparison of fixed effects estimate indicate that Gautam variety has the highest thousand kernel weight ($38.48\ \pm\ 4.32$ gm) and Tilottama has the least ($36.103\ \pm\ 4.32$ gm) among check varieties.
+
+Likewise, entry genotypes possessing a considerable amount of heritable variation can be evident from the ANOVA table (\@ref(tab:lrt-tkw)) and the dotplot (Figure \@ref(fig:yield-dotplot3) showing random effects estimates of the entry genotypes illustrate the relationship. Besides genotype, blocking along the columns nested inside the column groups had a significant role in determination of Thousand kernel weight.
+
+```{r yield-meanconf-tab3, results='asis'}
+yield_diffmean[[3]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Thousand kernel weight of check varieties (post-hoc comparison using Tukey procedure)",
+                     booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Number of grains per panicle
+
+Genotypes show significant differences for the Number of grains per panicle trait. LRT shows that both checks and entries possess significant ($\chi^2$ statistic=$11.59$ with $4\ df$) heritable variation. 
+
+Pairwise comparison of fixed effects estimate indicate that check varieties Aditya and Gautam have different mean Number of grains per panicle. Likewise pairwise contrast using same procedure (Tukey) indicates different means for Bhrikuti and Gautam varieties. The highest and the lowest number of grains per panicle was found in Gautam ($28.36\ \pm\ 1.88$) and Bhrikuti ($26.80\ \pm\ 1.88$) varieties, respectively.
+
+Similarly, entry genotypes show considerable amount of heritable variation as evident from a large measure of variance in random effects term. ANOVA table (\@ref(tab:lrt-gperpan)) and the dotplot (Figure \@ref(fig:yield-dotplot4)) showing random effects estimates of the entry genotypes illustrate the relationship. Likewise, no significant effects were associated with either of the blocking factors.
+
+```{r yield-meanconf-tab4, results='asis'}
+yield_diffmean[[4]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Number of grains per panicle of check varieties (post-hoc comparison using Tukey procedure)",
+                     booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Panicle length
+
+Genotypes show highly significant differences for the panicle length trait. LRT shows that both checks and entries possess significant ($\chi^2$ statistic=$14.62$ with $4\ df$) heritable variation. 
+
+Pairwise comparison of fixed effects estimate indicate that check variety Gautam has significantly longer panicles than (all) Aditya, Tilottama and Bhrikuti. Likewise pairwise contrast using same procedure (Tukey) indicates that no difference exists between other varieties. Longest panicles were found in Gautam ($17.53\ \pm\ 1.09$cm) and the shortest in Aditya ($16.32\ \pm\ 1.09$cm) varieties.
+
+Similarly, entry genotypes show considerable amount of heritable variation as evident from a large measure of variance in random effects term. ANOVA table (\@ref(tab:lrt-panlen)) and the dotplot (Figure \@ref(fig:yield-dotplot2)) showing random effects estimates of the entry genotypes illustrate the relationship. No attributable blocking effects, based on LRT, can be inferred about for the panicle length trait, alike most other yield and yield component traits.
+
+```{r yield-meanconf-tab5, results='asis'}
+yield_diffmean[[5]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Panicle length of check varieties (post-hoc comparison using Tukey procedure)",
+                     booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+<!-- ```{r yield-meanconf-viz, fig.cap="Mean of yield and yield component traits compared across check varieties for fixed effect estimates with grouped standard errors shown as error bars", fig.subcap=c("Yield of check varieties", "Number of effective tillers of check varieties", "Thousand kernel weight of check varieties", "Number of grains per panicle of check varieties", "Panicle length of check varieties"),  fig.ncol = 2, fig.show="hold", out.width="0.48\\linewidth"} -->
+
+<!-- # # Produces Least Squares Means (population means) table with p-values and Confidence intervals. -->
+<!-- # yield_mean <- map(.x = model_yield,  -->
+<!-- #                   .f = ~ lmerTest::lsmeansLT(.x, "check_or_line", adjust = "tukey")) -->
+
+<!-- # # 95% model confidence interval bars -->
+<!-- # model_cin <- yield_mean[[1]]$lsmeans.table %>% -->
+<!-- #   filter(!check_or_line == "line") %>% -->
+<!-- #   mutate(`Check variety` = c("Aditya", "Bhrikuti", "Gautam", "Tilottama")) %>% -->
+<!-- #   ggplot(aes(x=`Check variety`, y=Estimate, ymax=`Upper CI`, ymin=`Lower CI`, group=1)) + -->
+<!-- #   geom_col(fill="blue", -->
+<!-- #            color="grey70", width = 0.5) + -->
+<!-- #   geom_errorbar(position = position_dodge(0.9), width = 0.3) + -->
+<!-- #   labs(x = "Check variety", y = "Yield") + -->
+<!-- #   theme_bw() -->
+
+<!-- # # "Mean of check\\ varieties with model estimated\\ confidence intervals shown as error bars" -->
+<!-- # # 95% manual confidence interval bars -->
+<!-- # manual_cin <- all_data %>%  -->
+<!-- #   select(check_or_line, yield7) %>%  -->
+<!-- #   filter(!check_or_line == "line") %>%  -->
+<!-- #   ggplot(aes(check_or_line, yield7)) + -->
+<!-- #   stat_summary(fun.y = "mean", geom = "bar",  -->
+<!-- #                position = position_dodge(0.8),  -->
+<!-- #                color = "grey70", fill = "skyblue",  -->
+<!-- #                width = 0.5) + -->
+<!-- #   stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.3) + -->
+<!-- #   labs(x = "Check variety", y = "Yield") +  -->
+<!-- #   theme_bw() + -->
+<!-- #   theme(text = element_text(size = 14)) -->
+
+<!-- # error bars -->
+<!-- manual_ebar_data <- map(c("yield7",  -->
+<!--                           "effective_tiller7", "thou_grain_wt7",  -->
+<!--                           "grain_per_pan7", "panicle_len7"),  -->
+<!--                         ~ all_data %>%  -->
+<!--                           select(check_or_line, .x) %>%  -->
+<!--                           group_by(check_or_line) %>% -->
+<!--                           summarise_at(.x, funs(avg = mean(., na.rm = TRUE),  -->
+<!--                                                 sdev = sd(., na.rm = TRUE), rep = n())) %>% -->
+<!--                           ungroup() %>%  -->
+<!--                           mutate(lower_err = avg-(sdev/sqrt(rep)),  -->
+<!--                                  upper_err = avg+(sdev/sqrt(rep))) %>%  -->
+<!--                           filter(!check_or_line == "line") %>%  -->
+<!--                           mutate(check_or_line = factor(check_or_line,  -->
+<!--                                                         labels = c("Aditya", "Bhrikuti", "Gautam", "Tilottama")))) -->
+
+<!-- walk2(.x = manual_ebar_data,  -->
+<!--      .y = c("Yield", "Number of effective tillers",  -->
+<!--             "Thousand kernel weight", "Number of grains per panicle",  -->
+<!--             "Panicle length"),  -->
+<!--      ~ print(.x %>%  -->
+<!--   ggplot(aes(x=check_or_line, y=avg,  -->
+<!--              ymax=upper_err, ymin=lower_err, group=1)) + -->
+<!--   geom_col(fill="lightblue",  -->
+<!--            color="grey70", width = 0.4) + -->
+<!--   geom_errorbar(position = position_dodge(0.9), width = 0.3) + -->
+<!--   labs(x = "Check variety", y = .y) +  -->
+<!--   theme_bw() + -->
+<!--   theme(text = element_text(size = 14)))) -->
+<!-- ``` -->
+
+
+### Mean comparison of yield and yield component traits of entry genotypes
+
+```{r yield-blup-viz, fig.cap="Scatterplot of observed versus BLUP values of yield and yield component traits", fig.subcap=c("Yield", "Number of effective tillers", "Thousand kernel weight", "Number of grains per panicle", "Panicle length"), fig.keep='all', fig.width=5, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE}
+
+# obtain random effect intercepts and the summary of variance of fixed and random terms
+genotype_blups <- map2(.x = model_yield, 
+                      .y = c("yield7", "effective_tiller7", "thou_grain_wt7", 
+                                              "grain_per_pan7", "panicle_len7"),
+                      .f = ~ lme4::ranef(.x) %>% 
+                        purrr::pluck(1) %>% 
+                        rownames_to_column(var = "Entry genotype") %>% 
+                        rename_at(2, ~ "BLUP") %>% 
+                        filter(!`Entry genotype` == "check") %>% 
+                        left_join(all_data %>% 
+                                    select(lin_check, is_line, .y) %>% 
+                                    filter(is_line == "1", !(is.na(get(.y)))) %>% 
+                                    select(-is_line), by = c("Entry genotype"="lin_check")))
+
+walk2(.x = genotype_blups,
+      .y = c("Yield", "Number of effective tillers", 
+             "Thousand kernel weight", "Number of grains per panicle", 
+             "Panicle length"),
+      .f = ~  (ggplot(aes(x = BLUP, y = .x[,3]), data = .x) +
+                 geom_point() + ylab(.y)) %>% print())
+
+```
+
+
+Scatterplot showing observed mean values of yield and yield component traits plotted against their respective genotypic BLUP values is presented in Figure \@ref(fig:yield-blup-viz).
+
+```{r yield-fitted-obs-cor}
+
+mean_yield_fitted <- fitted_yield %>% 
+  select(-Genotype)
+
+mean_observed <- all_data %>% 
+  select(paste(c("yield", 
+                 "effective_tiller", "thou_grain_wt", 
+                 "grain_per_pan", "panicle_len"), "7", sep = ""))
+
+randdet <- map2_dbl(.x = mean_yield_fitted, 
+                    .y = mean_observed,
+                    .f = ~ (cor(unclass(.x), unclass(.y), use = "pairwise.complete.obs"))^2)
+```
+
+
+The coefficient of determination, as computed by squared correlation coefficient between the observed and fitted values of random effects model are `r randdet %>% round(digits = 2) %>% paste(collapse = ", ")`, respectively for the Yield, Number of effective tillers, Thousand kernel weight, Number of grains per panicle and Panicle length.
+
+```{r yield-dotplot, fig.cap="Random effect estimates of yield and yield component traits of entry genotypes", fig.subcap=c("Yield", "Number of effective tillers", "Thousand kernel weight", "Number of grains per panicle"), fig.keep='all', fig.width=7, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE, fig.asp=1.2}
+
+# remove_check_ranef <- function(x){
+#   y <- x;
+#   y$line_or_check <- y$line_or_check %>% 
+#     rownames_to_column("rn") %>% 
+#     slice(-1) %>% 
+#     column_to_rownames("rn") %>% 
+#     as.data.frame();
+#   return(y)
+# }
+
+random_effs <- map(.x = model_yield, 
+                   .f = ~  ranef(.x, condVar = TRUE))
+qq <- map(.x = random_effs, 
+          .f = ~ attr(.x[[1]], "postVar")[-1])
+       
+df <- map2(.x = random_effs, 
+           .y = qq,
+           .f = ~ data.frame(Intercepts = .x$line_or_check[,1][-1], # remove first intercept ("Check")
+                        sd.intercept = 2*sqrt(.y[1:length(.y)]), 
+                        level_names = rownames(.x$line_or_check)[-1]) %>% 
+         mutate(level_p_shapes = as.factor(if_else(Intercepts>0, 1, 16)))) #scale_shape_manual point shapes (1 and 16)
+
+walk(.x = df[1:4], 
+     .f = ~ print(.x %>% 
+       ggplot(aes(level_names,Intercepts,shape=level_p_shapes)) +
+       geom_hline(yintercept=0) + # horizontal line
+       geom_errorbar(aes(ymin=Intercepts-sd.intercept, # error bars
+                         ymax=Intercepts+sd.intercept), width=0,color="black") + 
+       geom_point(aes(size=2)) + # point size 2
+       guides(size=FALSE,shape=FALSE) + # remove legends
+       # scale_shape_manual(values=rep(c(1,16), each = 34)) + # not necessary
+       theme_bw() +
+       xlab("Levels") + 
+       ylab("") +
+       theme(axis.text.x=element_text(size=rel(1.2)),
+             axis.title.x=element_text(size=rel(1.3)),
+             axis.text.y=element_text(size=rel(1)),
+             panel.grid.minor=element_blank(),
+             panel.grid.major.x=element_blank()) +
+       coord_flip())
+)
+```
+
+
+```{r yield-dotplot2, fig.cap="Random effect estimates of yield and yield component traits of entry genotypes (...continued)", fig.subcap=c("Panicle length"), fig.keep='all', fig.width=7, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 1, fig.show="hold", warning=FALSE, message=FALSE, fig.asp=1.2}
+
+walk(.x = df[5], 
+     .f = ~ print(.x %>% 
+       ggplot(aes(level_names,Intercepts,shape=level_p_shapes)) +
+       geom_hline(yintercept=0) + # horizontal line
+       geom_errorbar(aes(ymin=Intercepts-sd.intercept, # error bars
+                         ymax=Intercepts+sd.intercept), width=0,color="black") + 
+       geom_point(aes(size=2)) + # point size 2
+       guides(size=FALSE,shape=FALSE) + # remove legends
+       # scale_shape_manual(values=rep(c(1,16), each = 34)) + # not necessary
+       theme_bw() +
+       xlab("Levels") + 
+       ylab("") +
+       theme(axis.text.x=element_text(size=rel(1.2)),
+             axis.title.x=element_text(size=rel(1.3)),
+             axis.text.y=element_text(size=rel(1)),
+             panel.grid.minor=element_blank(),
+             panel.grid.major.x=element_blank()) +
+       coord_flip())
+)
+```
+
+\clearpage

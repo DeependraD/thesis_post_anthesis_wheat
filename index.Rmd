@@ -1,0 +1,74 @@
+---
+author: 'DEEPENDRA DHAKAL'
+date: "`r Sys.Date()`"
+institution: 'AGRICULTURE AND FORESTRY UNIVERSITY'
+division: 'Plant Breeding'
+advisor: 'Prof. Madhav Prasad Pandey'
+#altadvisor: 'Your Other Advisor'
+committeememberone: 'Dr. Krishna Hari Dhakal'
+#committeemembertwo: 'Committeemember T. Name'
+department: 'GENETICS AND PLANT BREEDING DEPARTMENT'
+degree: 'Masters of Agriculture (Plant Breeding)'
+title: "STUDY OF LEAF HEALTH AS POTENTIAL DETERMINANT OF YIELD IN EARLY GENERATION TRIAL OF WHEAT IN RAMPUR, CHITWAN"
+# original_title: "STUDY OF SPATIAL PATTERNS IN RELATION TO LEAF HEALTH AS POTENTIAL DETERMINANT OF YIELD IN EARLY GENERATION TRIAL OF WHEAT IN RAMPUR, CHITWAN"
+knit: "bookdown::render_book"
+site: bookdown::bookdown_site
+output: 
+  thesisdowndss::thesis_pdf: default
+keep_md: true
+abstract: |
+  `r if(knitr:::is_latex_output()) paste(readLines("00-abstract.Rmd"), collapse = '\n  ')`
+acknowledgements: |
+  `r if(knitr:::is_latex_output()) paste(readLines("00-acknowledgements.Rmd"), collapse = '\n  ')`
+dedication: |
+  `r if(knitr:::is_latex_output()) paste(readLines("00-dedication.Rmd"), collapse = '\n  ')`
+# preface: |
+#   This is an example of a thesis setup to use the reed thesis document class
+#   (for LaTeX) and the R bookdown package, in general.
+bibliography: ["bib/thesis.bib", "bib/exported_items.bib"]
+csl: csl/apa.csl
+lot: true
+lof: true
+space_between_paragraphs: true
+
+header-includes:
+- \usepackage{tikz}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+- \usepackage[normalem]{ulem}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage{subcaption}
+# - \newcommand{\subfloat}[2][need a sub-caption]{\subcaptionbox{#1}{#2}} % subfloat already defined
+---
+
+```{r include_packages, include = FALSE, warning=FALSE, message=FALSE}
+# This chunk ensures that the thesisdowndss package is
+# installed and loaded. This thesisdowndss package includes
+# the template files for the thesis.
+if(!require(devtools))
+  install.packages("devtools", repos = "http://cran.rstudio.com")
+if(!require(thesisdowndss))
+  devtools::install_github("mine-cetinkaya-rundel/thesisdowndss")
+library(thesisdowndss)
+library(tidyverse)
+require(knitr)
+require(lme4)
+require(lmerTest)
+require(xtable)
+require(Hmisc)
+require(bookdown)
+knitr::opts_chunk$set(tidy = TRUE, cache = TRUE, 
+                      echo = FALSE, 
+                      tidy.opts = list(width.cutoff=50), 
+                      eval = TRUE, warning = FALSE, message = FALSE,
+                      fig.show = "hold", 
+                      fig.align = "center",
+                      fig.asp = 0.7)
+options(knitr.kable.NA = "", digits = 3)
+```

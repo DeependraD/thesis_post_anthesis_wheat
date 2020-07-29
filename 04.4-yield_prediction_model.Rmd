@@ -1,0 +1,176 @@
+## Yield prediction using leaf health
+
+A model approximating yield as a linear function of fixed effect terms for leaf health traits and random terms for blocking structure was formulated and ran. Along with model summary, effects estimates were obtained and coefficient of determination calculated based on the likelihood-ratio test (improvement from null (intercept only) model to the fitted model) [@magee1990r].
+
+### Stepwise variable selection
+
+For determining influencial variables among the candidates, stepwise variable selection was performed from a set of possible models. Table \@ref(tab:fixed-terms-kept) and Table \@ref(tab:rand-terms-kept) summarize which fixed and random effects variables, respectively, had or did not have significant influence in yield determination.
+
+```{r stepwise-elimination, echo=FALSE}
+# # since no difference between means can be
+# # compared with random effects lin_check 
+# # terms, let's fit a fixed effect for that
+# yld_vs_health1 <- lme4::lmer(yield7 ~ (1 | rowgroup) + (1 | colgroup) +
+#                                (1 | row:rowgroup) + (1 | col:colgroup) +
+#                                (1 | interaction_rc) + (1 | line_or_check) + 
+#                                check_or_line + dis_march15 +
+#                                greenness_z65 + greenness_z75 + greenness_z85 +
+#                                LAUG_65_75 + LAUG_65_75 + chl_ind1_2 + chl_ind2_2,
+#                              data = all_data)
+# #
+# anova(yld_vs_health1)
+# backward_elimination1 <- drop1(object = yld_vs_health1) # heavy crunching
+# stepwise_selection1 <- lmerTest::step(yld_vs_health1) # very heavy crunching
+# #
+# #
+# save(list = c("backward_elimination1", "stepwise_selection1", "yld_vs_health1"),
+#      file = "stepwise.RData", envir = .GlobalEnv)
+
+load("stepwise.RData")
+```
+
+
+```{r fixed-terms-kept, results='asis'}
+
+stepwise_selection1 %>% 
+  pluck('anova.table') %>% 
+  rownames_to_column(var = "Trait variables") %>% 
+  mutate(`Trait variables` = c("SPADII", "Disease Z75", "Greenness Z85", 
+                               "Check genotypes", "Greenness Z65",
+                               "Greenness Z75", "LAUG 65_75", "SPADI")) %>% 
+  knitr::kable(format = "latex", 
+               caption = "ANOVA of fixed effect model terms with indication of significance of variables", 
+               booktabs = T, linesep = "",
+               align = "c", longtable = TRUE) %>%
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position", "repeat_header"),
+                            full_width = FALSE, font_size = 10) %>%
+  kableExtra::row_spec(row = 0, bold = TRUE)
+```
+
+
+```{r rand-terms-kept, results='asis'}
+
+stepwise_selection1 %>% 
+  pluck('rand.table') %>% 
+  rownames_to_column(var = "Random variables") %>% 
+  mutate(`Random variables` = c("Nested col", "Rowgroup x Colgroup", "Nested row", 
+                               "Rowgroup", "Colgroup", "Line genotypes")) %>% 
+  knitr::kable(format = "latex", 
+               caption = "ANOVA of random effect model terms with indication of significance of variables", 
+               booktabs = T, linesep = "",
+               align = "c", longtable = TRUE) %>%
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position", "repeat_header"),
+                            full_width = FALSE, font_size = 10) %>%
+  kableExtra::row_spec(row = 0, bold = TRUE)
+```
+
+
+Stepwise variable selection and backward elimination of a mixed model with response variable yield suggests that, aside from the genotype effects, fixed effects of leaf health and canopy related traits significantly affect the yield (based on both, P-values calculated from F-test by  Sattethwaite's approximation and AIC [@mazerolle2004making; @wagenmakers2004aic] drop in the single term deletions of fixed effects terms in the model). In particular leaf greenness scores at Zadok's stage 65 and 75, LAUG value during Zadok's stage 65 and 75 and relative leaf chlorophyll content (SPADI) at Zadok's stage 65.
+
+### Efficiency of yield prediction
+
+```{r}
+full_rm <- yld_vs_health1 %>% broom::augment()
+
+r_sqds_full <- cor(full_rm$yield7, full_rm$.fitted)
+r_sqds_fixed <- MuMIn::r.squaredLR(yld_vs_health1, null.RE = TRUE)
+
+ran_lvls <- yld_vs_health1 %>% lme4::ranef() %>% pluck("line_or_check") %>% # 69 levels with "check"
+  rownames() %>%
+  magrittr::extract(-1)
+
+# # correlation between blups and observed values
+
+# cor(all_data %>%
+#       select(yield7, lin_check) %>%
+#       filter(lin_check %in% ran_lvls) %>%
+#       arrange(match(lin_check, ran_lvls)) %>%
+#       pull(yield7),
+#     yld_vs_health1 %>%
+#       lme4::ranef() %>%
+#       pluck("line_or_check") %>%
+#       pull("(Intercept)") %>%
+#       magrittr::extract(-1))
+```
+
+
+The coefficient of determination of full model (squared correlation coefficient between observed and fitted values) was `r r_sqds_full`. Similarly, accounting for random effects, including all blocking and treatment structures, $R^2$ value of fixed effects terms (i.e. proportion of variance explained by leaf health traits) is `r r_sqds_fixed[[1]]`.
+
+```{r relative-eff, echo=FALSE}
+# null model for leaf health effect test
+yld_vs_health0 <- lme4::lmer(yield7 ~ (1 | rowgroup) + (1 | colgroup) + 
+                               (1 | row:rowgroup) + (1 | col:colgroup) + 
+                               (1 | interaction_rc) + (1 | line_or_check), 
+                             data = all_data)
+
+# anova(yld_vs_health0, yld_vs_health1) # significant, of course
+
+# extract error std.dev from each models
+null_error <- yld_vs_health0 %>% 
+  lme4::VarCorr() %>% 
+  attr(which = "sc", exact = TRUE)
+
+alternate_error <- yld_vs_health1 %>% 
+  lme4::VarCorr() %>% 
+  attr(which = "sc", exact = TRUE)
+```
+
+
+Using relative efficiency measure: indicates the decrease in error variance with additional terms in alternative model (with leaf health traits) over null the model (with random terms only), approximate gain in efficiency with the use of leaf health in estimating yield was almost `r ((null_error^2/alternate_error^2)-1)*100`$\%$.
+
+```{r lsmeans-est, eval=FALSE}
+# # this chunk estimates lsmeans, which are the prediction estimates
+# # for given reference grid of factors. Here, the prediction is not
+# # important since, adjusting for fixed effects of leaf health traits
+# # is not what we want.
+
+# save pairwise difference
+# diff_lsmeans_pairwise <- stepwise_selection1 %>% 
+#   purrr::pluck("diffs.lsmeans.table")
+# 
+# diff_lsmeans_pairwise %>% 
+#   rownames_to_column(var = "diff_genotypes") %>% 
+#   filter(`p-value` < 0.05) %>% 
+#   top_n(10, wt = Estimate) %>% 
+#   arrange(desc(Estimate)) %>% 
+#   knitr::kable(format = "latex", 
+#                caption = "Top ten best performing genotypes with respect to estimated yields", 
+#                booktabs = T, linesep = "",
+#                align = "c") %>%
+#   kableExtra::kable_styling(position = "center",
+#                             latex_options = c("HOLD_position", "repeat_header", "scale_down"),
+#                             full_width = FALSE, font_size = 10) %>%
+#   kableExtra::row_spec(row = 0, bold = TRUE)
+# 
+# # save estimates
+# est_lsmeans <- stepwise_selection1 %>% 
+#   purrr::pluck("lsmeans.table")
+
+```
+
+Top ten best performing entry genotypes based on fitted yield (BLUPs) ranking with their yield estimates are shown in Table \@ref(tab:top-entry-genotypes).
+
+```{r top-entry-genotypes, results="asis"}
+full_rm %>%
+  select(`Entry genotype` = line_or_check, `Estimated yield` = .fitted) %>%
+  filter(!`Entry genotype` == "check") %>%
+  arrange(match(`Entry genotype`, ran_lvls)) %>% 
+  bind_cols(all_data[, c("line_or_check", "Genotype")] %>% 
+              filter(!line_or_check == "check" & line_or_check %in% ran_lvls) %>% 
+              arrange(match(line_or_check, ran_lvls)) %>% 
+              select(-line_or_check)) %>% 
+  top_n(10, wt = `Estimated yield`) %>%
+  arrange(desc(`Estimated yield`)) %>%
+  knitr::kable(format = "latex",
+               caption = "Top ten best performing genotypes with respect to estimated yields",
+               booktabs = T, linesep = "",
+               align = "c", longtable = TRUE) %>%
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position", "repeat_header"),
+                            full_width = FALSE, font_size = 10) %>%
+  kableExtra::row_spec(row = 0, bold = TRUE) %>% 
+  kableExtra::column_spec(1:2, width = "2.0cm")
+```
+

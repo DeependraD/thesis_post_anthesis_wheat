@@ -1,0 +1,209 @@
+# Literature review
+
+<!-- Required to number equations in HTML files -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+});
+</script>
+
+## Use of unreplicated designs in field trials {#unrep-designs}
+
+Early testing is a problem of how to optimize the use of resources. For a plant breeding program, the subject quickly bumps into the problem of having to reliably discriminate between the germplasm resources. The outcome of any planned crossing programme and it's advanced generations--the seed propagule, has to qualify a test or more in order to proclaim itself valuable, and to noticeably proceed to further generations, eventually to make its way being released as a cultivar.
+
+A replicated trial generally forms the basis of estimation of error variance that arises due to heterogeneous experimental conditions, also the inference about the treatment effects should acknowledge largely the role of error variance that characterizes most biological traits [@machado_introduction_2006], crop's agro-morphological traits being no exception. While it is customary to implement blocking in replicated trials of the genotype under evaluation with the inclusion of certain check cultivars for local control, the option comes to no avail when the replication of the genotype under test is not feasible due to scarcity of the material. The constraint in the amount of seed of a particular genotype and abundance of number of such genotypes is often what constitutes most early generation testing program. As described by statisticians and field researchers elsewhere, a possible solution here is to augment a randomized design trial having a certain fraction of the plots allocated to check cultivar with entries at limited quantity in some designed setup with partial or even no replication at all [@piepho_augmented_2016; @federer_augmented_1994]. It is in this constrained scenario that the applicability of Incomplete Block designs [@yates1936incomplete] is realized.
+
+Some of the well known augmented designs and variants of it include randomized complete block and resolvable incomplete block designs for addressing one way heterogeniety, early row-colum designs consisting of equal number of rows and columns defined with systematic arrangement of treatments including that for checks [@federer_augmented_1975; @lin_modified_1983]. Each of these designs can be used to estimate the error variance in unreplicated trials with variying efficiencies.
+
+In general, two common variants of augmented designs exist: Augmented block design and Augmented row-column design. As the name suggests, the former class of designs are useful in elliminating heterogeniety in one direction (in which blocks are laid), while those of latter class are effective in elliminating in two or more way field heterogenity.
+
+### Augmented block designs {#aug-block-des}
+
+Implementing augmented block design in study, a researcher is concerned with estimating block effects and the new varieties' (here-on also referred to as entry or new entry) effects. This class of designs was first described by [@federer1956augmented]. Since the checks are the only units repeated in the field, the portions of field that constitute a block from the combination of checks provide information required to estimate the block effects. Only those designs are selected where, the block effects are variance-balanced (i.e., variances of difference between blocks effects are all equal). This is a condition to be met by design to be regarded as optimal.
+
+#### Design principles {#des-prin-aug-block}
+
+A simple augmented block design addresses unidirectional heterogeniety in the field. In augmented designs where checks are laid in randomized complete blocks, following design parameters need to be specified:
+
+Number of checks: $\nu$ ($i = 1, 2, 3,..., \nu$)
+
+Number of blocks: $r$ ($j = 1, 2, 3,..., r$)
+
+Number of new varieties(entries): $\nu^*$ ($i = 1, 2,..., \nu^*$)
+
+Check varieties are randomly alloted to the experimental units within each of the $r$ blocks which are complete for the check varities, and let the yield of the $i^{th}$ check variety in the $j^{th}$ block be $y_{ij}$. Let the $\nu^*$ new varieties be randomly arranged such that $l_{i}$ new varieties occur in the $j^{th}$ block, let $\sum\limits_{i = 1}^r = \nu^*$, and let $z_{ij}$ be the yield of the $i^{th}$ new variety in the $j^{th}$ block in which it occurs. For simplicity, we are assuming that the block effects are non-random effects. Note that for the $z_{ij}$ yields, $j = 1, 2, ..., r$ and $i = 1, 2,..., \nu^*$. Using the check variety yields alone, run the statistical analysis for a randomized complete block design, and let EMS be the estimated error mean sum square obtained from this analysis. Then for any pair of those new varieties, say $i$ and $i^{\prime}$, occuring together in the same block, the difference in their effects is estimated by $z_{ij}- z_{i^{\prime}j}$ with standard error of $\sqrt{2EMS}$; the difference between two new varieties, $i$ and $i^\prime$, occuring in blocks $j$ and $j^\prime$, respectively, is estimated by $z_{ij}-z_{i^{\prime}j}-(\bar{y_{i}}-\bar{y_{i^{\prime}}})$ with a standard error of $\sqrt{2(\nu + 1)EMS/\nu}$, where $\bar{y_{i}}$ is the mean of the $j^{th}$ block computed on check variety yields only.
+
+#### Statistical analysis {#stat-an-aug-block}
+
+The statistical analysis may be done in following way:
+
+**Step 1**
+\newline The trial on $v + v^*$ varieties may be analyzed using standard methods for disproportionate numbers in the subclasses; then, contrasts among the check varieties, among the new varieties, and among the checks and new varieties may be made.
+
+**Step 2**
+\newline A statistical analysis is performed on the check variety yields only, and blocking effects, a general mean effect, and check variety effects are estimated; an estimate of the experimental error variance is obtained. Then, the estimated new variety means or effects are obtained and the varietal contrasts are made as in Step 1.
+
+### Augmented row-column design for small number of check varieties {#aug-row-col-des}
+
+Improvements have been made in early block form of augmented designs in the past. With the description of row-column designs in early half of 1970, modification of original systematic-treatment-placement designs such as augmented lattic square designs [@federer_incomplete_2002], and $\alpha$-$\alpha$ designs [@williams_note_2003] were introduced. Augmented row-column designs for small number of checks were, however, a much latter addition.
+
+This class of augmented designs are more flexible, in that they allow for arbitrarily large number of new cultivars, the number of rows and columns ,and even allow for dealing with additional form of three way field heterogenity.
+
+#### Design principles {#des-prin-aug-row-col}
+
+Following design parameters are required to initialize a search for an efficient row-column design:
+
+Number of rows: $k$
+
+Number of columns: $s$
+
+Number of checks: $\nu_c$
+
+Number of rowgroups: $g_k$ ($rg = 1, 2, ..., g_k$)
+
+Number of colgroups: $g_s$ ($cg = 1, 2, ..., g_s$)
+
+Number of new entries: $\nu_e$
+
+Number of plots allocated to checks per block: $\nu_{g_{k}g_{s}}$
+
+@piepho_augmented_2016 has provided a framework for generation of this form of design. The steps are mentioned as follows:
+
+1. Blocks are the units formed by the intersection of adjacent rowgroups and colgroups ($g_kg_s$). Define the number of plots for each block $(g_k.g_s)$ that are to be allocated to checks. Note that, this number need not be a constant.
+
+2. Allocate check cultivars ($\nu_c$) to check plots based on the following model for design factors: $g_k + g_s + g_k.g_s$.
+
+3. In each row group (i.e., $g_k$), consider the classification of rows ($k$) by column groups (i.e., $g_s$). From step 2, we have a design for $\nu_c$-by-$g_s$ classification. Consider both check cultivar and $g_s$ of this design as factors and optimize the allocation of rows so that effects for rows can be estimated with good efficiency. This produces a row-column group design for check cultivar.
+
+4. In each column group (i.e., $g_s$), consider the classification of row groups (i.e., $g_k$) by columns ($s$). From step 2, we have a design for the check $\nu_c$-by-$g_k$ classification. Consider both check cultivar and rowgroups of this design as block factors and optimize the allocation of columns so that effects for columns can be estimated with good efficiency. This produces a row group-column design for check cultivars.
+
+5. Merge the two designs obtained in steps 3 and 4 to obtain the final design for checks.
+
+6. Allocate entries to free plots in completely randomized order.
+
+#### Statistical analysis {#stat-an-aug-row-col}
+
+The responses sampled from a row-column design may be analysed using linear models with effect for both the row and column factors and, effects for genotypes. Futher effects(rowgroup, columngroup, and rowgroup-columngroup interaction) that are associated with with block also need to be specified, due to restricted randomization imposed in allocation of checks within blocks. Thus, the full model for a response $y$ can be stated as show in Equation \@ref(eq:fixed-linear-model-form).
+
+\begin{equation}
+y = \mu + rowgroup + colgroup + 
+rowgroup.colgroup + rowgroup.row + colgroup.col + 
+genotype + e
+(\#eq:fixed-linear-model-form)
+\end{equation}
+
+where, $\mu$ is the common intercept and $e$ is the residual plot error. 
+
+All block effects, with exception of effects for genotype, may be taken as random. Furthermore, the linear model may also be adjusted to fit a separate terms for fixed effects for checks and a random effects for new entries.
+
+<!-- ## Spatial analysis of field trials -->
+
+<!-- The spatial dynamics of experimental field is often overlooked however a well rounded topic. Comparable to having a design perspective to successfully obtain measures of error in contrasting treatments under study, interpretation of a field trial depend also on analytical frameworks employed.  -->
+
+<!-- Factorial designs flexible enough to accomodate large number of treatments in a very compact space are among the latest developments in design of experiments. While conducting varietal screening trial for stress environments, or while undergoing a soil management experiment, it requires that the variability within experimental plots be dealt. Thus, analysis of field trials boils down to effectively separating out the environmental effects that, if not controlled for, might just as easily get confounded with the treatment effects. The problem presents a greater challange if the number of treatments to be tested is large, as homogeniety of experimental units spanning over large area cannot be assured. Even the blocking of units has limited applicability if sources of variation are bi- or multi- directional. More importantly, as blocking is preconceived and immutable structure that has it's roots on the experimental design, further sources of variabilities aside from those addressed in design are the subject of rigorous analysis.  -->
+
+<!-- Design techniques such as control plots, replications and blocks are available in the planning stage to account for such variabilities [@edmondson2005past]. In addition, irrespective of the design, various spatial adjustment techniques have been developed (e.g. ARMA, ARIMA) and have been shown to significantly increase heritability and thus make selection more efficient especially in abiotic stress environments (Gilmouret al. 1997, Singh et al. 2003). -->
+
+<!-- @snedecor1967statistical has alerted that variables being studied be noramally distributed and be spatially independent in order for popular statistical frameworks to be applied for inference. However, the underlying mechanics of natural environment ensure that factors like soil properties and crop yield components, instead of having random spatial distributions, do have spatial dependence, meaning that the observations are somehow related to their neighbours [@plant2012spatial; @van1993spatial]. It seems obvious that the existence of spatial dependence is scale dependent. @wendroth1997statistical found spatial dependence for soil fertility properties, and studies suggest its effects within experimental plot as close as 30 by 30 m [@vieira2003analysis]. Similarly, soil-atmosphere phenomena such as soil temperature are reported to be spatially autocorrelated at very high geographical resolutions [@al2002spatial]. -->
+
+<!-- An augmented row-column design may be analysed considering spatial model for plot error ($e$) [@clarke2011optimal]. A linear mixed effects model with spatial covariance structure specified for plot error ($e$) may be fitted. Spatial models assume that variables having spatial autocorrelation can be adjusted with some decreasing function of spatial distance, which usually results in improved precision of the analysis [@piepho2010linear]. -->
+ 
+## Crop development and yield formation
+
+Process attributing to yield formation, mainly growth and phenological processes, transcend the level of inputs and agricultural sophistication as evidenced by remarkable similarity of trend in yield despite differences in average yields across different countries for the past century [@satorre1999wheat].
+
+Crop development is defined as the sequence of phenological events conditioned by external factors resulting in changes in the morphology and/or function of some organs [@landsberg1977some]. Internal or external morphological changes can, thus, describe the crop development. Duration of each phase of development and the developmental pathway of each subsequent phase, which is dictated by the intitiation of primodial structures during earlier phase, is determined by the interaction between genetic and environmetal factors. Among several methods those used to describe major developmental events, some which are non destructive in sampling are also in use, one of such being the growth scoring code postulted by J. C. Zadoks [@zadoks1974decimal].
+
+As complex a trait the crop yield is, it is explained well when explored in relation to developmental phase of crop. Dynamics of multitude of factors are involved since the very beginning of a life cycle of crop, as early as the beginning of embryonic activities when inside the seed.
+
+### Leaf development
+
+By the time wheat crop has grown to a seedling, five to seven leaf primordia will have been developed [@mcmaster1997phenology], meaning that two to three leaf primordia will have already developed well before the tip of the first leaf appears. Duration through which the apical primary primordia persists depends on genotype and environmental factors. Plastochron(thermal time between the initiation of two consecutive leaf primordia) is usually a constant value for a given environment [@wilhelm1995importance]. The maximum number of leaves is determined when the apex changes the development from vegetative to reproductive with the floral initiation. A model devised by @kirby1985effect relates leaf and spike initiation phases with number of leaves that appear in main shoot.
+
+### Tiller development
+
+The phytomer contains axillary tiller buds, each of which is able to differentiate into leafy tillers. The relationship between the number of phyllochrons and the number of primary tillers that appear approaches perfectly linear, with an intercept at 3 units in horizontal axis when plotted the number of primary tillers approximated by phyllochrons. Similar pattern follows in tillers that develop from secondary and tertiary tillers. This relationship is only valid only to the extent provided resources are unlimited, in field, however, the potential tiller emergence rate is slower than that predicted by Fionacci series [@masle1985competition], as competition occurs within a single plant system and also between multiple of those. 
+
+Alongside the emergence and growth of the tiller, in environmental conditions, tiller mortality is also a defining factor for overall crop stand due maturity. This occurs in the order reverse to that in which the tillers appeared. Phenomena of tiller mortality is reasoned to accelerate at around stem elongation phase due concomitant increase in demand of assimilates to the developing shoots.
+
+### Spikelet and floret development
+
+Spikelet intitiation begins with the appearance of double ridge in the apical region of a shoot. This is followed by the floral initiation and finally terminates with the initiation of terminal spikelet in the apical meristem. It is also shown that the rate of spikelet initiation is negatively correlated total number of leaves on a shoot. 
+
+The floret development progresses towards the ends starting with the signs first visible in the lower middle portion of a spike head. Similarly, accumulation of the Growing Degree Days(GDD) provides an indication of for how long floret initiation within each spikelet continues. It continues approximately untill a GDD period of 200-300$^\circ$C above 0$^\circ$C , with the latter being reference temperature, before the appearance of the flag leaf ligule. It is postulated that floret death too occurs due to increased competition for assimilates, once stem and spikes growth surges, alike tiller death. The competition phenomena that determines the proportion of florets liable to maintain normal rate of development has been validated in studies that compared the genotypes having different partitioning between spikes and stems ratios [@brooking1981interrelationships]. 
+
+### Grain filling
+
+Wheat is a kleistogamus plant. So, once the pollination occurs inside a floret, it begins to develop as a potential grain after it has been are fertilised.
+
+Grain development in wheat passes through a series of distinct well characterized phases. In the initial "lag phase", the grain does not gain much in weight. Although the phase generally spans almost $1/4^{th}$ of the total postanthesis period, only 5 to 10 percent of total grain weight is gained during this. However the term lag phase ascribed to earlier phase, the latter stage of grain growth-- which substantially adds to the grain weight, can be well modelled both by in a logistic function as well as bilineal function.
+
+This stage of development too is strictly regulated by the thermal time, in absence of severe environmental stresses however, in which case permature termination of grain filling leads to sub-optimal dry weight [@nicolas1984effects].
+
+## Crop yield and yield component traits
+
+In modern wheat, gains in yield increases are due to increased harvest index, shorter period from sowing to anthesis, and more number of grains per unit area. Therefore, spikelet initiation and formation stage, which occurs before anthesis, and has direct relation to yield . This asserts that total number of grains/kernels per spike head(a component trait of yield) is largely a function of pre-flowering vegetative stage. It has also been concluded that genetic yield increases resulted from an increase in the number of kernels produced rather than an increase in kernel size [@mccaig1995breeding]. This suggests that bread wheat has been sink-limited at grain filling.
+
+From the crop physiology perspective, yield component trait (i.e., for wheat, plants per unit area, spikes per plant, grains per spike, and grain weight) approach to understand yield is one but largely unreliable approach [@slafer1996yield; @fischer1996wheat]. Owing to the fact that individual yield components are negatively correlated with each other, improvement in one trait will inevitably result in compensative negative effects in some other [@slafer2003genetic]. But understanding of exact nature of relationships between component traits might, enable breeders to manipulate them correctly [@slafer1996yield]. However, given that there exists a strong negative correlation among mostly vegetative stage defined yield component traits (summarized here as the number of grain kernels), it might be reasonable to seek to manipulate a different component trait such as grain yield. The grain weight is probably a much a simpler component, considering its distinctness from other correlated yield component traits in the pathway to yield determination; all other component traits could be summarized to number of grains for given unit of measure (usually, per unit land area).
+
+## Factors affecting wheat growth and development
+
+The major influencer of wheat growth and development is temperature. Every stage of development is, however, to a different degree depending upon various factors [@slafer1995base], sensitive to temperature. This is unlike most other environmental growth affecting factors including moisture and photoperiod, which only exhibit their effects either when factors prevail at their extremes or are range in their effects based on the crop's growth stage. 
+
+### Temperature
+
+Generally, with higher temperature, the rate of development is faster and thus certain phase of crop growth becomes shorter. From among various temperature dependent growth models proposed to predict the growth phase, the thermal time model is the one most widely accepted [@squire1984response]. The simplified form of the model is shown in Equation \@ref(eq:thermal-time-growth).
+
+\begin{equation}
+thermal\ time = \frac{mean\ daily\ temperature - base\ temperature(^oC)}{growth\ rate(kg\ day^{-1})}
+(\#eq:thermal-time-growth)
+\end{equation}
+
+Conceptually, thermal time is the inverse of change in rate of growth rate per unit temperature, from base to optimum temperaure. The concetp assumes that the relationship between rate of development and temperature in linear. Similarly related are the leaf initiation and appearance and, the temperature. Emperically, The slope of the relationship is the rate of these processes per degree day, and the reciprocal of these slopes are the plastochron and phyllochron [@slafer1995photoperiod]. So, at the least, the parameters of thermal time are specific for a given genotype and developmental stage. This way, the model can be linearized, as it remains unaffected by nuances of relationship change caused solely due to phasic development. In practice, however, thermal time is calculated as the accumulated daily mean temperature above a base temperature [@rawson1979influence; @angus1981phasic].
+
+Studies have highlighted the role of mean air temperature during booting and ear emergence [@calderini1999effect; @calderini2001importance]. In a different study aimed at understanding the relationship between temperature dependent growth processes and natural variation associated with the temperature, mostly those conspicious during vegetative to reproductive transition of wheat crop, authors investigated the vernalization requirements among Nepalese wheat and barley. Wheats from villages of high altitudes tended to require more vernalization than those from lower altitudes suggestive of local adaptation. This also leads to inference that seed exchange among Nepalese farmers is either poor or well provisoned with a sound knowledge base about local varietal adaptation [@rao1977genetic].
+
+Unlike atomospheric temperature, which is mostly influenced by incident solar radiation, Soil or root zone temperature is influenced several factors. The factors include intensity, the quality, and the duration of solar radiation, air temperature, surface vegetation, and the color and the thermal conductivity of the soil. The optimum soil temperature reported for maximum yield of the Bread wheat is $20^oC$ [@whitfield1971soil].
+
+The cardinal air temperature for growth of wheat is summarized below:
+
+||Temperature|
+|:---:|:---:|
+|Minimum temperature|$3^oC$-$4^oC$|
+|Optimun temperature|$25^oC$|
+|Maximum temperature|$30^oC$-$32^oC$|
+
+: Table of cardinal of temperature of wheat growth [@briggle1987wheat]
+
+### Soil moisture
+
+Water has it's role in translocation of mineral and anabolic reactions inside plant system. Both high and low levels of moisture can reduce the crop yield, as excess moisture, above all, reduces soil aeration and thus the supply of Oxygen to roots. This can, in turn, have negative effect on soil microbial dynamics. Moisture stress causes both the reduction in cell division and cell elongation, thus in overall growth.
+
+Wheat can be grown in regions where annual precipitation ranges from 250 to 1750 mm. Water associated stress has detrimental effect in all yield associated components [@abayomi1999effects]. In a study that correlates effects of different levels of soil water tension measured near surface, authors point out that component traits like number of spikes per square meter, the number of spikelets per spike, and the number of grains per spike are among the most affected by increasing levels of soil-water-tension [@zhang1999water]. Root characterstic is mostly associated with the genetic variation that confers drought resistance [@hoad2001management].
+
+Wheat grown in medium textured soil is unlikely to have simple moisture deficit(occurs when root zone profile exausts of available water) during early stage of crop growth since wheat is usually planted under favourable soil moisture conditions. However, more serious consequences are faced in grain yield when water shortage occurs, in general, after ear initiation. One of the conditions which emphasizes role of moisture stress is due tiller mortality, which is dependent on pre-anthesis water availability [@aspinall1970inhibition; @begg1976crop]. The potential grain number which is directly related to the production of fertile gametes and fertilization is other most influential yield-determining process affected by moisture stress during critical periods of pre-anthesis and anthesis [@bingham1966varietal]. Similarly, post-anthesis drought causing a reduction in thousand grain weight has been described by some authors as other major determinant of yield [@asana1958studies; @day1970some; @day1978drought].
+
+### Solar radiation
+
+The intensity of solar radiation varies with the latitude and the season. Tropical to Sub tropical regions occuring within lattitude $20^oN$-$30^oN$ observe the highest incidence of solar radiation. 
+
+Solar radiation is converted through fixative cycles into biomass or the crop's usable produce. An emperical framework to describe the relationship between the absorbed Photosynthetically Active Radiation ($PAR_A$), the radiation use efficiency and the factors accounting for the canopy structure, which is represented by leaf area index (LAI) and the radiation extinction coefficient ($\textit{k}$), is stated by Beer's law [@goyne1993radiation]. The relationship is presented in Equation \@ref(eq:par-lai).
+
+\begin{equation}
+PAR_A = PAR_0[1-e^{-\textit{k}LAI}]
+(\#eq:par-lai)
+\end{equation}
+
+where $PAR_0$ is the above canopy or incident radiation.
+
+Radiation use efficiency is the slope of a linear function having dry matter accumulation per unit time, at the rate unconstrained by stress causing extraneous factors like soil moisture, nutrients, temperature, and the number of actively growing points, as response approximated by the absorbed photosynthetically active radiation ($PAR_A$).
+
+Wheat is not the most efficient utiliser of $PAR_A$, with only $3.7\%$ of total incident radiation utilized for dry matter accumulation. Sparing the energy efficiency factor, wheat has, however, a better growth rate compared to the $C_4$ plant Corn, reported when compared across similar growing conditions of temperate region [@fageria2010growth]. In wheat, most of the between cultivar differences in growth duration is accounted for by photoperiod and vernalization sensitivity factor associated with the genotypes [@satorre1999wheat]. Besides that, there is general agreement that a variety should have a high leaf area index and erect leaves, so as to make the best use of incident solar energy.
+
+@damania1985variation measured morphological traits and heading date in wheat and barley landrace samples from Nepal and Yemen grown at an experiment station. They found considerable variation within and between regions. In the case of barley from Nepal and wheat from Yemen this variation correlated significantly with the altitude of origin.
+
+The correlations of Grain Filling Period (GFP) with other traits indicated that improvement in GFP should also improve grain yield, harvest index and kernel weight [@sharma1992duration]. Findings from the study have asserted that selecting for simultaneously longer GFP and a shorter Vegetative Growth Period (VGP) which is related to earliness of heading, will lead to improved yields. In addition, the author mentions that each of the periods expressed as proportions is negatively correlated with the other which adds to the importance of precisely identifying the growth periods during selection. @sharma1993_yield_inf also reported that biomass yield, harvest index, kernel weight, and durations for the vegetative growth (VGP) and grain filling (GFP) were related to the grain yield.
+
+@sharma1987yield reported that the seed rate affected the grain yield, tiller number, grains/spike, 1000 kernel weight, days to heading, and plant height at harvest. For both reduced and higher seed rates than the recommended (120 $t\ ha^{-1}$), there was an adverse effect on all the above-mentioned traits. The effect of dew on wheat yield and soil water balance at Rampur showed that grain yield was significantly higher for irrigated treatment (4.02 $t\ ha^{-1}$) followed by rainfed (3.03 $t\ ha^{-1}$), dew (2.60 $t\ ha^{-1}$) and control (2.58 $t\ ha^{-1}$) treatments. The moisture meter readings and soil moisture content analysis also showed that dew did not significantly contribute to the evapo-transpiration requirement of wheat [@sharma1984contribution].
+
+In a study using different intensities of leaf defoliation as treatment in wheat to study relationship among genotypes with different levels of foliar pathogen resistance, investigators reported the removal of flag leaf as having significant effects on both the yield and yield component traits [@rosyara2005yield]. Generalizing over the fact that the loss of most photosynthetically active organ causes reduction in yields, though at various levels of severity based on the genotypic reaction to disease, characterization of candidate traits that actively interact in the field grown wheat to influence yields is the subject matter of due concern.

@@ -1,0 +1,5 @@
+book_filename: "thesis"
+chapter_name: "Chapter "
+rmd_files: ["index.Rmd", "01-introduction.Rmd", "02-literature_review.Rmd", "03-materials_and_methods.Rmd", "04-results.Rmd", "04.1-modeling_of_yield_and_yield_component_traits.Rmd", "04.2-modeling_of_leaf_health_and_senescence.Rmd", "04.3-modeling_other_plant_responses.Rmd", "04.4-yield_prediction_model.Rmd", 04.5-correlation_and_graphical_summary.Rmd, "05-discussion.Rmd", "06-conclusion.Rmd", "08-appendix.Rmd", "99-references.Rmd"]
+download: [["thesis.pdf", "PDF"], ["thesis.epub", "EPUB"], ["thesis.docx", "Word"]]
+delete_merged_file: true

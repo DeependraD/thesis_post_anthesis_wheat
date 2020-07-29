@@ -1,0 +1,241 @@
+plot,lin_check,Jan_23_2017,Jan_26_2017,Jan_29_2017,Feb_02_2017,Feb_06_2017,Feb_23_2017,Chilling_01_23,disease_overall_01_26
+1,L106,Before booting,Before booting,Booting,Awns appearing minus,Spikes appearing plus,Watery stage minus,0,
+2,3,Swollen boot,Spikes appearing,One fourth of spikes appeared plus,Anthesis stage I plus,Anthesis stage IV,Soft dough stage plus,twisted_leaves,
+3,1,Booting,Awns appearing,Spikes appearing minus,Three fourth of spikes appeared plus,Anthesis stage II,Soft dough stage minus,0,
+4,L79,Booting,Booting,Awns appearing plus,Half spikes appeared,Spikes have fully emerged plus,Watery stage plus,2,35
+5,L92,Before booting,Booting,Booting plus,Spikes appearing,Spikes have fully emerged minus,Watery stage minus,1,21
+6,1,Booting,Awns appearing,Spikes appearing plus,Three fourth of spikes appeared,Anthesis stage III minus,,0,99
+7,1,Swollen boot,Spikes appearing,Half spikes appeared minus,Spikes have fully emerged plus,Anthesis stage III plus,,twisted_leaves,99
+8,2,Spikes appearing,Half spikes appeared,Three fourth of spikes appeared minus,Anthesis stage III,Anthesis advanced,,,23
+9,3,Swollen boot,Spikes appearing,One fourth of spikes appeared minus,Spikes have fully emerged plus,Anthesis stage III minus,,0,40
+10,L12,Before booting,Before booting,Booting,Swollen boot minus,Spikes appearing,Watery stage minus,0,35
+11,4,Spikes appearing,Three fourth of spikes appeared,Three fourth of spikes appeared plus,Anthesis stage III plus,Anthesis advanced,,twisted_leaves,25
+12,L98,Before booting,Before booting,Before booting,Before booting,Booting,Watery stage minus,0,12
+13,L17,Before booting,Booting,Spikes appearing minus,Half spikes appeared,Anthesis stage I,Watery stage minus,1,35
+14,3,Swollen boot,Awns appearing,Spikes appearing minus,Spikes have fully emerged,Anthesis stage III,,0,50
+15,L37,Before booting,Before booting,Before booting,Booting,Awns appearing,Watery stage minus,0,5
+16,4,Spikes appearing,Half spikes appeared,Three fourth of spikes appeared plus,Anthesis stage II,Anthesis stage III,,1,40
+17,2,Spikes appearing,Three fourth of spikes appeared,Spikes have fully emerged,Anthesis stage II,Anthesis advanced plus,,0,35
+18,4,One fourth of spikes appeared,Three fourth of spikes appeared,Spikes have fully emerged minus,Anthesis stage II plus,Anthesis advanced plus,,1,30
+19,L95,Booting,Booting,Spikes appearing minus,Three fourth of spikes appeared,Anthesis stage I,Watery stage minus,0,25
+20,L88,Booting,Booting,Swollen boot minus,Spikes appearing,Three fourth of spikes appeared,Watery stage,0,35
+21,1,Swollen boot,Awns appearing,One fourth of spikes appeared minus,Spikes have fully emerged plus,Anthesis stage III,,0,99
+22,4,Half spikes appeared,Spikes have fully emerged,Spikes have fully emerged plus,Anthesis stage II,Anthesis advanced,,0,30
+23,L49,Before booting,Before booting,Swollen boot minus,Awns appearing minus,Spikes appearing plus,Watery stage minus,0,25
+24,L38,Booting,Booting,Awns appearing plus,Half spikes appeared,Spikes have fully emerged,Watery stage minus,0,33
+25,3,Booting,Spikes appearing,Spikes appearing plus,Anthesis stage II,Anthesis stage III,,tip_piping,35
+26,2,Spikes appearing,One fourth of spikes appeared,Half spikes appeared plus,Anthesis stage I,Anthesis advanced,,0,30
+27,1,Swollen boot,Spikes appearing,Spikes appearing plus,Anthesis stage I,Anthesis stage III,,0,45
+28,L10,Before booting,Before booting,Booting plus,Booting plus,Spikes appearing plus,Watery stage minus,0,22
+29,2,Awns appearing,Spikes appearing,One fourth of spikes appeared plus,Spikes have fully emerged,Anthesis stage III,,0,40
+30,L4,Before booting,Before booting,Booting,Booting,Spikes appearing,Watery stage minus,spots,28
+31,2,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared minus,Anthesis stage II,Anthesis stage IV,,0,30
+32,L13,Before booting,Booting,Booting plus,Awns appearing,Half spikes appeared,Watery stage,0,99
+33,3,Swollen boot,Spikes appearing,One fourth of spikes appeared,Anthesis stage II,Anthesis stage III plus,,0,30
+34,L43,Booting,Booting,Swollen boot minus,One fourth of spikes appeared,Spikes have fully emerged,Watery stage,0,35
+35,L58,Booting,Booting,Swollen boot,One fourth of spikes appeared,Spikes have fully emerged plus,Watery stage plus,,23
+36,,,,,,,,,
+37,L24,Awns appearing,Awns appearing,Spikes appearing,Spikes have fully emerged,Anthesis stage II,Milky stage,piping,25
+38,L33,Before booting,Booting,Swollen boot plus,Spikes appearing,Half spikes appeared,Watery stage minus,,35
+39,4,Half spikes appeared,Half spikes appeared,Spikes have fully emerged,Anthesis stage III,Anthesis advanced,,piping,50
+40,1,Awns appearing,Spikes appearing,One fourth of spikes appeared plus,Anthesis stage I,Anthesis stage IV,,,50
+41,3,Awns appearing,Spikes appearing,Half spikes appeared,Anthesis stage III,Anthesis stage IV,,,50
+42,L89,Before booting,Booting,Awns appearing,One fourth of spikes appeared,Three fourth of spikes appeared plus,Milky stage,,30
+43,2,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared minus,Anthesis stage II,Anthesis stage IV,,,28
+44,2,Before booting,Spikes appearing,Half spikes appeared,Anthesis stage I,Anthesis stage III,,,38
+45,L57,Before booting,Booting,Awns appearing plus,One fourth of spikes appeared,Three fourth of spikes appeared plus,Milky stage,,35
+46,4,Awns appearing,Spikes appearing,Half spikes appeared plus,Anthesis stage I,Anthesis stage II,,,
+47,4,Awns appearing,Spikes appearing,Half spikes appeared,Anthesis stage I,Anthesis stage III,,,
+48,L94,Before booting,Booting,Booting,Swollen boot,Spikes appearing,Watery stage minus,,
+49,3,Swollen boot,Awns appearing,Spikes appearing plus,Anthesis stage I,Anthesis stage IV,,,
+50,L46,Before booting,Before booting,Before booting,Booting minus,Spikes appearing plus,,disperse_tiller,
+51,L53,Booting,Awns appearing,Spikes appearing minus,Half spikes appeared,Anthesis stage I plus,,,
+52,1,Swollen boot,Spikes appearing,Spikes appearing plus,Three fourth of spikes appeared,Anthesis stage III,,,
+53,4,One fourth of spikes appeared,Half spikes appeared,Spikes have fully emerged,Anthesis stage III plus,Anthesis advanced,,,
+54,L82,Before booting,Before booting,Before booting,Before booting,Before booting,,,
+55,2,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared minus,Anthesis stage I,Anthesis advanced,,,
+56,L62,Before booting,Before booting,Booting minus,Swollen boot,Spikes appearing,,,
+57,1,Swollen boot,Spikes appearing,Spikes appearing plus,Three fourth of spikes appeared plus,Anthesis stage III,,,
+58,3,Awns appearing,Spikes appearing,One fourth of spikes appeared,Anthesis stage I,Anthesis stage III,,,
+59,3,Spikes appearing,Spikes appearing,One fourth of spikes appeared,Anthesis stage II,Anthesis stage IV,,,
+60,L40,Before booting,Before booting,Before booting,Booting plus,Spikes appearing,,,
+61,3,Spikes appearing,Spikes appearing,One fourth of spikes appeared plus,Anthesis stage II,Anthesis stage IV,,,
+62,2,Spikes appearing,One fourth of spikes appeared,Half spikes appeared plus,Anthesis stage II,Anthesis advanced,,,
+63,L76,Before booting,Before booting,Before booting,Awns appearing,Awns appearing plus,,,
+64,4,Spikes appearing,Half spikes appeared,Three fourth of spikes appeared,Anthesis stage II,Anthesis stage IV plus,,,
+65,2,Awns appearing,Spikes appearing,One fourth of spikes appeared,Anthesis stage I,Anthesis stage III,,,
+66,L28,Before booting,Before booting,Booting plus,Spikes appearing plus,One fourth of spikes appeared,,,
+67,L41,Awns appearing,Spikes appearing,Half spikes appeared,Anthesis stage I,Anthesis stage IV minus,,,
+68,4,One fourth of spikes appeared,One fourth of spikes appeared,Spikes have fully emerged minus,Anthesis stage III,Anthesis advanced,,,
+69,L83,Swollen boot,Awns appearing,Awns appearing plus,One fourth of spikes appeared,Anthesis stage I,,,
+70,1,Awns appearing,Spikes appearing,Half spikes appeared minus,Anthesis stage I,Anthesis stage II plus,,,
+71,3,Awns appearing,Awns appearing,Spikes appearing,Spikes have fully emerged plus,Anthesis stage II,,,
+72,L5,Before booting,Before booting,Before booting,Booting,Awns appearing,,,
+73,1,Swollen boot,Awns appearing,Spikes appearing plus,Spikes have fully emerged,Anthesis stage II,,,
+74,1,Spikes appearing,Spikes appearing,One fourth of spikes appeared plus,Anthesis stage I,Anthesis stage III,,,
+75,L85,Booting,Booting,Spikes appearing plus,Half spikes appeared,Spikes have fully emerged plus,,,
+76,L32,Before booting,Booting,Swollen boot,Spikes appearing plus,Half spikes appeared minus,,,
+77,L108,Before booting,Booting,Spikes appearing minus,Half spikes appeared minus,Three fourth of spikes appeared,,,
+78,4,Spikes appearing,Half spikes appeared,Three fourth of spikes appeared plus,Anthesis stage III,Anthesis advanced,,,
+79,L7,Before booting,Booting,Swollen boot plus,One fourth of spikes appeared,Half spikes appeared,,,
+80,2,Spikes appearing,Spikes appearing,Three fourth of spikes appeared,Anthesis stage II,Anthesis advanced,,,
+81,L99,Before booting,Before booting,Before booting,Before booting,Awns appearing plus,Late anthesis,,
+82,1,Spikes appearing,Spikes appearing,Half spikes appeared plus,Anthesis stage III,Anthesis stage IV,,piping,
+83,L101,Before booting,Before booting,Swollen boot,Spikes appearing,Half spikes appeared,Watery stage minus,,
+84,3,Awns appearing,Spikes appearing,One fourth of spikes appeared,Anthesis stage II,Anthesis stage III,,,uniform
+85,2,Spikes appearing,Spikes appearing,Half spikes appeared,Anthesis stage I,Anthesis stage IV,,,nonuniform
+86,4,Spikes appearing,One fourth of spikes appeared,Half spikes appeared minus,Anthesis stage I plus,Anthesis stage II,,,
+87,L34,Before booting,Before booting,Before booting,Booting,Swollen boot,,,
+88,L96,Before booting,Before booting,Booting,Swollen boot,Spikes appearing plus,Watery stage minus,,
+89,L67,Before booting,Before booting,Booting,Booting,Spikes appearing,Late anthesis,,
+90,L77,Before booting,Before booting,Swollen boot minus,Swollen boot minus,One fourth of spikes appeared,Late anthesis,,
+91,3,Awns appearing,Awns appearing,One fourth of spikes appeared minus,Anthesis stage II,Anthesis stage III,,,
+92,4,Spikes appearing,Half spikes appeared,Three fourth of spikes appeared,Anthesis stage III,Anthesis advanced,,,
+93,2,Awns appearing,Spikes appearing,Half spikes appeared,Anthesis stage I,Anthesis stage III plus,,,
+94,L9,Before booting,Before booting,Swollen boot minus,Spikes appearing,Half spikes appeared,Watery stage plus,,
+95,L66,Before booting,Before booting,Booting plus,Awns appearing minus,Half spikes appeared,Watery stage,,
+96,3,Booting,Swollen boot,Swollen boot plus,Spikes appearing,Spikes have fully emerged minus,,,
+97,1,Swollen boot,Awns appearing,Spikes appearing plus,Anthesis stage I,Anthesis stage II,,,
+98,1,Swollen boot,Awns appearing,Spikes appearing minus,Three fourth of spikes appeared,Anthesis stage II,,,
+99,L91,Before booting,Before booting,Before booting,Before booting,Booting,Late anthesis,,
+100,L44,Spikes appearing,Spikes appearing,Half spikes appeared minus,Anthesis stage I,Anthesis stage II plus,Soft dough stage,non_uniform,
+101,2,Awns appearing,Spikes appearing,One fourth of spikes appeared plus,Anthesis stage I,Anthesis stage III,,,
+102,4,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared,Anthesis stage II,Anthesis stage IV,,piping,
+103,L29,Before booting,Before booting,Booting,Booting,Swollen boot,Late anthesis,,
+104,L21,Before booting,Booting,Booting,Spikes appearing,Three fourth of spikes appeared,Watery stage,,
+105,2,Spikes appearing,Spikes appearing,Half spikes appeared,Anthesis stage I,Anthesis stage III,,,
+106,4,Spikes appearing,Half spikes appeared,Three fourth of spikes appeared,Anthesis stage III minus,Anthesis advanced,,uniform,
+107,1,Awns appearing,Awns appearing,Spikes appearing plus,Spikes have fully emerged,Anthesis stage II,,,
+108,L84,Before booting,Before booting,Booting,Swollen boot,Spikes appearing,Late anthesis,,
+109,1,Swollen boot,Awns appearing plus,Spikes appearing plus,Three fourth of spikes appeared,Anthesis stage II,,,
+110,L87,Before booting,Booting,Swollen boot,One fourth of spikes appeared,Half spikes appeared,Late anthesis,,
+111,L18,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared,Anthesis stage I,Anthesis stage III,Soft dough stage plus,,uniform
+112,2,Spikes appearing,Spikes appearing,Half spikes appeared minus,Three fourth of spikes appeared,Anthesis stage III,,,
+113,L15,Before booting,Booting,Swollen boot minus,Spikes appearing minus,Three fourth of spikes appeared,Watery stage minus,,
+114,L72,Before booting,Before booting,Before booting,Booting,Swollen boot,Late anthesis,,
+115,3,Awns appearing,Spikes appearing,One fourth of spikes appeared,Anthesis stage II,Anthesis stage II plus,,,
+116,3,Swollen boot,Awns appearing,Spikes appearing plus,Spikes have fully emerged,Anthesis stage III,,,
+117,4,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared minus,Anthesis stage II,Anthesis advanced minus,,,
+118,2,Spikes appearing,Spikes appearing plus,Three fourth of spikes appeared,Anthesis stage II,Anthesis stage IV,,,
+119,L6,Booting,Swollen boot,Awns appearing plus,Three fourth of spikes appeared,Anthesis stage I minus,Watery stage,,
+120,1,Awns appearing,Spikes appearing,One fourth of spikes appeared minus,Anthesis stage I,Anthesis stage II plus,,,
+121,L45,Before booting,Before booting,Before booting,Swollen boot,Spikes appearing,Late anthesis,,
+122,2,Spikes appearing,One fourth of spikes appeared plus,Spikes have fully emerged minus,Anthesis stage II,Anthesis stage IV,,,
+123,L8,Before booting,Before booting,Before booting,Before booting,Awns appearing plus,Late anthesis,,
+124,1,Swollen boot,Spikes appearing minus,One fourth of spikes appeared plus,Anthesis stage I,Anthesis stage III,,,
+125,L65,Booting,Swollen boot,Awns appearing minus,Spikes appearing,Three fourth of spikes appeared,Watery stage minus,,
+126,2,Spikes appearing,Half spikes appeared,Three fourth of spikes appeared,Anthesis stage II,Anthesis stage IV,,,
+127,4,Spikes appearing,Spikes appearing plus,Half spikes appeared,Anthesis stage I,Anthesis stage III minus,,,nonuniform
+128,3,Swollen boot,Spikes appearing minus,One fourth of spikes appeared,Anthesis stage I minus,Anthesis stage II plus,,,
+129,L103,Before booting,Before booting,Before booting,Swollen boot minus,Awns appearing plus,Late anthesis,,
+130,2,Awns appearing,Spikes appearing minus,One fourth of spikes appeared,Three fourth of spikes appeared,Anthesis stage II,,,
+131,L69,Before booting,Before booting,Before booting,Booting,Spikes appearing,Watery stage minus,,
+132,3,Swollen boot,Swollen boot,Awns appearing plus,One fourth of spikes appeared,Spikes have fully emerged minus,,,
+133,3,Booting,Swollen boot plus,Awns appearing minus,One fourth of spikes appeared,Spikes have fully emerged minus,,,
+134,L48,Before booting,Booting,Swollen boot minus,Swollen boot,One fourth of spikes appeared,Watery stage minus,,
+135,4,Spikes appearing,One fourth of spikes appeared plus,Spikes have fully emerged,Anthesis stage III,Anthesis stage IV,,,uniform
+136,4,Spikes appearing,One fourth of spikes appeared,Half spikes appeared plus,Anthesis stage II,Anthesis stage III,,,uniform
+137,L70,Before booting,Before booting,Before booting,Before booting,Awns appearing,Late anthesis,,
+138,L19,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared minus,Anthesis stage I,Anthesis stage II,Milky stage plus,,
+139,1,Swollen boot,Awns appearing,Spikes appearing,Three fourth of spikes appeared,Anthesis stage II,,,
+140,4,Spikes appearing,Spikes appearing,Three fourth of spikes appeared minus,Anthesis stage I,Anthesis stage III plus,,,
+141,L36,Before booting,Swollen boot,Awns appearing,One fourth of spikes appeared,Three fourth of spikes appeared,Milky stage,,
+142,L90,Before booting,Booting minus,Swollen boot,Swollen boot plus,Half spikes appeared,Watery stage minus,,
+143,4,Spikes appearing,One fourth of spikes appeared plus,Half spikes appeared,Anthesis stage II,Anthesis stage IV,,,
+144,3,Swollen boot,Swollen boot,Spikes appearing,One fourth of spikes appeared,Anthesis stage II,,,
+145,L52,Before booting,Booting,Swollen boot minus,Spikes appearing plus,Three fourth of spikes appeared,Milky stage,,
+146,L14,Before booting,Booting,Booting,Booting plus,Spikes appearing plus,Watery stage minus,,
+147,2,Awns appearing,Spikes appearing minus,One fourth of spikes appeared minus,Three fourth of spikes appeared,Anthesis stage I plus,,,
+148,2,Awns appearing,Awns appearing,Spikes appearing,Three fourth of spikes appeared,Anthesis stage I,,,
+149,2,Swollen boot,Awns appearing minus,Awns appearing plus,Half spikes appeared,Spikes have fully emerged minus,,,nonuniform
+150,L23,Awns appearing plus,Spikes appearing,One fourth of spikes appeared,Anthesis stage I,Anthesis stage III minus,Hard dough stage,,
+151,3,Swollen boot,Swollen boot plus,Spikes appearing plus,Half spikes appeared,Anthesis stage II,,,
+152,L105,Before booting,Before booting,Booting plus,Spikes appearing,One fourth of spikes appeared plus,Late anthesis,,
+153,4,Awns appearing,Spikes appearing plus,Half spikes appeared,Anthesis stage I,Anthesis stage III plus,,,
+154,3,Awns appearing,Spikes appearing plus,Half spikes appeared minus,Anthesis stage II,Anthesis stage IV,,,
+155,L42,Swollen boot,Awns appearing,Spikes appearing,Anthesis stage I minus,Anthesis stage III,Watery stage plus,,
+156,1,Swollen boot,Awns appearing minus,Spikes appearing,Three fourth of spikes appeared,Anthesis stage II,,chill_stress,
+157,L80,Before booting,Before booting,Before booting,Booting,Awns appearing minus,Late anthesis,,
+158,1,Swollen boot,Awns appearing plus,Spikes appearing plus,Three fourth of spikes appeared,Anthesis stage II,,,
+159,L63,Before booting,Before booting,Booting plus,Spikes appearing minus,One fourth of spikes appeared,Watery stage,,
+160,4,Spikes appearing,Spikes appearing plus,Half spikes appeared,Anthesis stage II,Anthesis stage III plus,,,
+161,3,Spikes appearing,Spikes appearing,Half spikes appeared minus,Anthesis stage II,Anthesis stage III,,,
+162,4,One fourth of spikes appeared,Half spikes appeared plus,Spikes have fully emerged plus,Anthesis stage III,Anthesis stage IV plus,,,
+163,L93,Booting,Swollen boot,Swollen boot,Spikes appearing,Half spikes appeared,Watery stage plus,,
+164,2,Spikes appearing,Spikes appearing plus,Half spikes appeared,Anthesis stage II,Anthesis stage IV minus,,,
+165,1,Booting,Awns appearing,Spikes appearing,Spikes have fully emerged minus,Anthesis stage I plus,,,
+166,L71,Before booting,Before booting,Before booting,Swollen boot,One fourth of spikes appeared,Late anthesis,,
+167,2,One fourth of spikes appeared,One fourth of spikes appeared plus,Three fourth of spikes appeared plus,Anthesis stage II,Anthesis stage III plus,,,
+168,L16,Before booting,Booting,Swollen boot minus,Spikes appearing,Three fourth of spikes appeared,Watery stage,healthy,
+169,4,Spikes appearing,Spikes appearing,Half spikes appeared minus,Anthesis stage I,Anthesis stage III,,,
+170,L51,Before booting,Booting,Swollen boot minus,One fourth of spikes appeared,Three fourth of spikes appeared plus,Milky stage,,
+171,1,Swollen boot,Swollen boot plus,Spikes appearing,Half spikes appeared,Anthesis stage II,,,
+172,,,,,,,,,
+173,L102,Before booting,Booting,Booting,Awns appearing,Spikes appearing,Watery stage minus,,
+174,L74,Before booting,Before booting,Before booting,Booting,Booting,Late anthesis,,
+175,3,Booting,Swollen boot minus,Spikes appearing minus,Half spikes appeared,Anthesis stage I,,,
+176,1,Swollen boot,Swollen boot,Awns appearing plus,Half spikes appeared,Anthesis stage I minus,,,
+177,3,Swollen boot,Awns appearing minus,Spikes appearing plus,Three fourth of spikes appeared,Anthesis stage I plus,,,
+178,L11,Before booting,Before booting,Before booting,Before booting,Booting,Late anthesis,,
+179,L104,Before booting,Booting,Swollen boot minus,Spikes appearing plus,Three fourth of spikes appeared,Milky stage,,
+180,2,Awns appearing,Spikes appearing,Half spikes appeared minus,Anthesis stage II,Anthesis stage IV minus,,,
+181,4,Spikes appearing,One fourth of spikes appeared plus,Three fourth of spikes appeared,Anthesis stage II,Anthesis stage IV,,,
+182,L30,Before booting,Before booting,Before booting,Booting,Swollen boot,Watery stage minus,,
+183,2,Spikes appearing,Spikes appearing plus,Half spikes appeared minus,Anthesis stage I,Anthesis stage III,,,
+184,1,Awns appearing,Spikes appearing minus,One fourth of spikes appeared,Spikes have fully emerged,Anthesis stage III minus,,,
+185,L3,Before booting,Booting minus,Booting,Spikes appearing minus,One fourth of spikes appeared,Watery stage minus,,
+186,3,Booting,Awns appearing plus,Spikes appearing,Three fourth of spikes appeared,Anthesis stage II,,,
+187,L27,Before booting,Before booting,Before booting,Before booting,Before booting,Late anthesis,,
+188,1,Swollen boot minus,Swollen boot minus,Spikes appearing minus,Half spikes appeared,Anthesis stage I,,,
+189,L39,Before booting,Before booting,Before booting,Booting,Spikes appearing minus,Late anthesis,,
+190,3,Booting,Awns appearing plus,Spikes appearing plus,Spikes have fully emerged,Anthesis stage III minus,,,
+191,1,Swollen boot,Spikes appearing minus,Spikes appearing,Three fourth of spikes appeared,Anthesis stage I,,,
+192,1,Swollen boot,Awns appearing minus,Spikes appearing,Three fourth of spikes appeared,Anthesis stage I plus,,,
+193,L78,Swollen boot,Awns appearing plus,One fourth of spikes appeared minus,Three fourth of spikes appeared plus,Anthesis stage III,Soft dough stage,,"uniform, waxy"
+194,3,Swollen boot,Spikes appearing,Half spikes appeared,Anthesis stage II,Anthesis stage III minus,,,
+195,L73,Before booting,Booting,Swollen boot minus,Awns appearing,One fourth of spikes appeared minus,Late anthesis,,
+196,2,Awns appearing,Awns appearing,Spikes appearing plus,Spikes have fully emerged,Anthesis stage I,,,
+197,L31,Booting,Booting plus,Swollen boot plus,Spikes appearing minus,Half spikes appeared,Watery stage minus,,
+198,4,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared,Anthesis stage III,Anthesis stage IV,,,
+199,L64,Before booting,Before booting,Before booting,Before booting,Swollen boot minus,Late anthesis,,
+200,2,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared,Anthesis stage II,Anthesis stage IV plus,,,uniform
+201,L107,Swollen boot,Awns appearing plus,Spikes appearing plus,Three fourth of spikes appeared,Spikes have fully emerged,Watery stage,,
+202,1,Swollen boot,Spikes appearing minus,Spikes appearing plus,Three fourth of spikes appeared,Anthesis stage I plus,,,
+203,L61,Before booting,Before booting,Booting,Spikes appearing,Three fourth of spikes appeared,Watery stage,,
+204,4,Spikes appearing,One fourth of spikes appeared minus,Three fourth of spikes appeared plus,Anthesis stage II,Anthesis stage III plus,,,
+205,L47,Before booting,Booting,Swollen boot,Awns appearing plus,One fourth of spikes appeared,Late anthesis,,waxy
+206,L97,Before booting,Before booting,Booting,Awns appearing plus,Half spikes appeared plus,Watery stage,,
+207,2,Awns appearing,Spikes appearing,Half spikes appeared plus,Anthesis stage I,Anthesis stage III,,,
+208,1,Swollen boot,Awns appearing minus,Spikes appearing,Three fourth of spikes appeared,Anthesis stage I plus,,,
+209,L35,Before booting,Swollen boot minus,Swollen boot,One fourth of spikes appeared,Three fourth of spikes appeared plus,Watery stage plus,,
+210,L59,Before booting,Booting,Swollen boot minus,Spikes appearing,Half spikes appeared,Watery stage,,
+211,2,Awns appearing,Spikes appearing,Half spikes appeared plus,Anthesis stage I,Anthesis stage III minus,,,
+212,3,Swollen boot,Awns appearing plus,Spikes appearing plus,Half spikes appeared,Anthesis stage III minus,,,uniform
+213,3,Swollen boot,Swollen boot plus,Awns appearing plus,One fourth of spikes appeared,Anthesis stage I,,,
+214,4,Spikes appearing,Spikes appearing plus,Half spikes appeared minus,Anthesis stage II,Anthesis stage III,,,
+215,1,Booting,Swollen boot plus,Spikes appearing,Three fourth of spikes appeared,Anthesis stage II,,,
+216,L68,Before booting,Booting,Swollen boot minus,Spikes appearing,One fourth of spikes appeared,Late anthesis,,
+217,4,Spikes appearing,Half spikes appeared minus,Spikes have fully emerged plus,Anthesis stage II,Anthesis stage IV,,,
+218,L81,Before booting,Before booting,Before booting,Before booting,Awns appearing,Late anthesis,,
+219,L2,Booting,Swollen boot minus,Awns appearing,Spikes appearing plus,Three fourth of spikes appeared,Late anthesis,,
+220,3,Booting,Swollen boot plus,Spikes appearing,Half spikes appeared,Anthesis stage I,,,
+221,L26,Swollen boot,Spikes appearing minus,Spikes appearing plus,Half spikes appeared,Anthesis stage I plus,Milky stage,,
+222,1,Swollen boot,Swollen boot,Spikes appearing,Half spikes appeared,Spikes have fully emerged plus,,,
+223,3,Swollen boot minus,Swollen boot minus,Awns appearing plus,One fourth of spikes appeared,Spikes have fully emerged minus,,,
+224,L86,Awns appearing,Spikes appearing,Spikes appearing plus,Three fourth of spikes appeared,Spikes have fully emerged plus,Watery stage minus,,
+225,2,Swollen boot,One fourth of spikes appeared,Half spikes appeared plus,Anthesis stage I,Anthesis stage IV,,,
+226,L22,Booting,Swollen boot minus,Spikes appearing minus,One fourth of spikes appeared,Three fourth of spikes appeared,Milky stage,,
+227,4,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared,Anthesis stage II,Anthesis stage IV minus,,,
+228,L54,Before booting,Before booting,Before booting,Booting,Swollen boot,Watery stage minus,,
+229,L60,Before booting,Before booting,Before booting,Booting,Booting plus,Late anthesis,,
+230,L55,Before booting,Before booting,Booting,Swollen boot,Swollen boot plus,Late anthesis,,
+231,4,Awns appearing,Spikes appearing plus,Half spikes appeared minus,Anthesis stage I,Anthesis stage II,,,
+232,2,Swollen boot,Spikes appearing,One fourth of spikes appeared minus,Three fourth of spikes appeared,Anthesis stage II minus,,,
+233,L56,Before booting,Booting,Swollen boot minus,Spikes appearing,Half spikes appeared,Watery stage,,
+234,L1,Before booting,Before booting,Booting,Booting,Spikes appearing minus,Late anthesis,,
+235,1,Swollen boot,Swollen boot plus,One fourth of spikes appeared minus,Three fourth of spikes appeared plus,Anthesis stage II minus,,,
+236,4,Spikes appearing,One fourth of spikes appeared,Three fourth of spikes appeared,Anthesis stage I,Anthesis stage III,,,
+237,1,Swollen boot,Awns appearing plus,One fourth of spikes appeared minus,Three fourth of spikes appeared,Anthesis stage I,,,
+238,3,Awns appearing,Awns appearing plus,One fourth of spikes appeared,Anthesis stage II,Anthesis stage III,,,
+239,2,Spikes appearing,Spikes appearing plus,Half spikes appeared,Anthesis stage II,Anthesis stage IV plus,,,
+240,L20,Booting,Swollen boot minus,Awns appearing plus,One fourth of spikes appeared minus,Spikes have fully emerged minus,Watery stage plus,,

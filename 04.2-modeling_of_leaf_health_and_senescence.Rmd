@@ -1,0 +1,556 @@
+
+```{r model-health-setup, include=FALSE}
+knitr::opts_chunk$set(tidy = TRUE, cache = TRUE, 
+                      echo = FALSE, 
+                      tidy.opts = list(width.cutoff=50), 
+                      eval = TRUE, fig.pos = "H",
+                      fig.align = "center", 
+                      fig.asp = 0.7)
+options(knitr.kable.NA = "", digits = 3)
+```
+
+
+## Modeling leaf health traits
+
+<!-- dataset loaded in previous chapter -->
+
+<!-- ### Visualization of leaf health traits -->
+
+<!-- ```{r leaf-health-viz, fig.cap="Disease score trait versus superimposed blocks factor", fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold"} -->
+
+<!-- stringr::str_subset(colnames(all_data), "dis_") %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup),  -->
+<!--                         y = get(.x)), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab(.x))) # for multiple plots use `paste` -->
+
+<!-- ``` -->
+
+
+<!-- ```{r leaf-health-viz2, fig.cap="Leaf greenness traits versus superimposed blocks factor", fig.subcap=paste("Leaf greenness at zadok's stage", c(65, 75, 85)), fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold"} -->
+
+
+<!-- stringr::str_subset(colnames(all_data), "green") %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup), # block -->
+<!--                         y = get(.x)), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab(.x))) -->
+<!-- ``` -->
+
+
+<!-- ```{r leaf-health-viz3, fig.cap="Leaf area under greenness (LAUG) traits versus superimposed blocks factor", fig.subcap=paste("LAUG between zadok's stages", c("65 and 75", "75 and 85")), fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold"} -->
+
+
+<!-- stringr::str_subset(colnames(all_data), "LAUG") %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup), # block -->
+<!--                         y = get(.x)), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab(.x))) -->
+<!-- ``` -->
+
+
+<!-- ### Mixed modeling of leaf health traits -->
+
+```{r leaf-health-model, eval=TRUE}
+
+# model_leaf_health <- purrr::map(.x = c("dis_march15", "greenness_z65", 
+#                                        "greenness_z75", "greenness_z85", 
+#                                        "LAUG_65_75", "LAUG_75_85"), 
+#                                 .f = ~ lme4::lmer(get(.x) ~ 
+#                                             (1 | rowgroup) + 
+#                                             (1 | colgroup) +
+#                                             (1 | row:rowgroup) + 
+#                                             (1 | col:colgroup) + 
+#                                             (1 | interaction_rc) + 
+#                                             (1 | line_or_check) + check_or_line,
+#                                           data = all_data))
+
+# save(list = c("model_leaf_health"), 
+#      file = "04.2-modeling_of_leaf1.RData", 
+#      envir = .GlobalEnv)
+load("04.2-modeling_of_leaf1.RData")
+```
+
+
+### Model estimates of leaf health traits
+
+```{r leaf-health-fitted-vs-observed-tab, results = "asis", eval=TRUE, echo=FALSE}
+
+# # BLUPs/fitted values
+fitted_leaf_health <- map2(.x = model_leaf_health, 
+                           .y = c("dis_march15", "greenness_z65", 
+                                  "greenness_z75", "greenness_z85", 
+                                  "LAUG_65_75", "LAUG_75_85"), 
+                           ~ predict(.x) %>% 
+                             enframe(name = "Genotype", 
+                                     value = paste(.y, "fitted")))
+
+# # tidying BLUPs
+fitted_leaf_health <- full_join(fitted_leaf_health[[1]], fitted_leaf_health[[2]], by = "Genotype") %>% 
+  full_join(fitted_leaf_health[[3]], by = "Genotype") %>% 
+  full_join(fitted_leaf_health[[4]], by = "Genotype") %>% 
+  full_join(fitted_leaf_health[[5]], by = "Genotype") %>% 
+  full_join(fitted_leaf_health[[6]], by = "Genotype") %>% 
+  mutate(Genotype = as.numeric(Genotype)) %>% 
+  arrange(Genotype)
+
+
+# fitted_leaf_health <- all_data[,c(c("row", "col", "rowgroup", "colgroup", 
+#                                  "plot", "lin_check"), 
+#                                c("dis_march15", "greenness_z65", 
+#                                  "greenness_z75", "greenness_z85", 
+#                                  "LAUG_65_75", "LAUG_75_85"))] %>%
+#   bind_cols(fitted_leaf_health)
+
+observed_split <- all_data %>%
+  select(Genotype, 
+         `encoding` = `lin_check`, 
+         `Disease (Zadok's 75)` = `dis_march15`,
+         `Greenness (Zadok's 65)` = `greenness_z65`,
+         `Greenness (Zadok's 75)` = `greenness_z75`,
+         `Greenness (Zadok's 85)` = `greenness_z85`,
+         `LAUG (Zadok's 65-75)` = `LAUG_65_75`, 
+         `LAUG (Zadok's 75-85)` = `LAUG_75_85`
+         ) %>% 
+  group_by(encoding, Genotype) %>%
+  summarise_if(is.numeric, function(x)mean(x, na.rm = TRUE)) %>%
+  ungroup() 
+
+observed_split %>% 
+  knitr::kable(format = "latex",
+               caption = "Model adjusted genotypic mean responses of leaf health traits",
+               booktabs = T, linesep = "",
+               align = "c",
+               longtable = TRUE) %>%
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position", "repeat_header"),
+                            full_width = FALSE, font_size = 8) %>%
+  kableExtra::column_spec(column = 1, width = "1.5cm") %>%
+  kableExtra::column_spec(column = 2, width = "4.85cm") %>%
+  kableExtra::column_spec(column = 3:8, width = "1.75cm") %>%
+  kableExtra::landscape()
+
+```
+
+
+\blandscape
+
+### Mixed model summary of fixed effects terms of leaf health traits
+
+```{r leaf-health-summary-tab, results="asis", echo=FALSE}
+
+# # must use this function with float=FALSE in stargazer
+long_stargazer <- function(...){
+  output <- capture.output(stargazer::stargazer(...))
+  # The lines 4 and second last lines are the ones we want to remove...
+  output[c(4, length(output)-1)] <- output[c(4, length(output)-1)] %>% 
+    stringr::str_replace("tabular", "longtable")
+  # cat out the results - this is essentially just what stargazer does too
+  cat(paste(output, collapse = "\n"), "\n")
+}
+
+long_stargazer(model_leaf_health[1:6], type = "latex", 
+               title = "Model summary of leaf health traits", 
+               style = "all", digits = 2, header = FALSE, 
+               font.size = "footnotesize", 
+               column.labels = c("\\parbox[t]{2.3cm}{Disease score zadok 75}", 
+                                 "\\parbox[t]{2.3cm}{Greenness1}", 
+                                 "\\parbox[t]{2.3cm}{Greenness2}", 
+                                 "\\parbox[t]{2.3cm}{Greenness3}", 
+                                 "\\parbox[t]{2.3cm}{LAUG1}", 
+                                 "\\parbox[t]{2.3cm}{LAUG2}"), 
+               model.names = TRUE, dep.var.labels.include = FALSE,
+               keep = c("check_or_line\\d", "Constant"), report = "vc*sp",
+               covariate.labels = c("Bhrikuti", "Gautam", 
+                                    "Tilottama", "Aditaya (Constant)"),
+               single.row = TRUE, df = FALSE, omit.stat = c("adj.rsq"), 
+               column.sep.width = "1pt", float = FALSE)
+```
+
+
+\elandscape
+
+<!-- ### ANOVA table of fixed effects terms of leaf health traits -->
+
+<!-- ```{r leaf-health-anova-tabs, results = 'asis', eval=TRUE, echo=FALSE} -->
+
+<!-- # # automated attribute changing generates new list, gotta assign to object -->
+<!-- anova_leaf_health <- pmap(list(model_leaf_health,  -->
+<!--                                 paste("ANOVA of",  -->
+<!--                                       c("Disease", "Leaf greenness1",  -->
+<!--                                         "Leaf greenness2",  -->
+<!--                                         "Leaf greenness3",  -->
+<!--                                         "LAUG1", "LAUG2"))),  -->
+<!--                            .f = function(x, y) {x <- anova(x);  -->
+<!--                            attr(x, which = "heading") <-  y;  -->
+<!--                            return(x)}) -->
+
+<!-- walk2(.x = anova_leaf_health,  -->
+<!--       .y = c("ANOVA of response variable disease score at zadok stage 75",  -->
+<!--              "ANOVA of response variable leaf greenness score at zadok stage 65",  -->
+<!--              "ANOVA of response variable leaf greenness score at zadok stage 75",  -->
+<!--              "ANOVA of response variable leaf greenness score at zadok stage 85",  -->
+<!--              "ANOVA of response variable LAUG during zadok stage 67-75",  -->
+<!--              "ANOVA of response variable LAUG during zadok stage 67-85"),  -->
+<!--       ~ print(.x %>% -->
+<!--         knitr::kable(format = "latex",  -->
+<!--                      caption = .y,  -->
+<!--                      booktabs = T, linesep = "",  -->
+<!--                      align = "c") %>%  -->
+<!--         kableExtra::kable_styling(position = "center", -->
+<!--                                   latex_options = c("HOLD_position"), -->
+<!--                                   full_width = FALSE) %>% -->
+<!--         kableExtra::column_spec(column = 0, bold = TRUE))) -->
+<!-- ``` -->
+
+#### Disease score at Zadok's stage 75
+<!-- Ratings scores are inclusive in the lower bounds and exclusive on upper bounds. -->
+
+Genotypes show highly significant differences for the disease resistance trait. LRT shows that both checks and entries possess significant ($\chi^2$ statistic=$13.85$ with $4\ df$) heritable variation. 
+
+Pairwise comparison of fixed effects estimate indicate that check variety Gautam is relatively more asymptomatic ($2.51\ (\pm\ 1.30)$) than Bhrikuti($3.32\ (\pm\ 1.30)$) and Tilottama ($3.35\ (\pm\ 1.30)$) varieties to foliar pathogen. Although, no distinction could be made on the severity scale of the disease (All check varieties exhibited similarly less affected (2.5-5.0) symptom at the time of scoring).
+
+Entry genotypes also show considerable amount of heritable variation evident from a large measure of random effects variance contributed by the genotypes. ANOVA table (\@ref(tab:lrt-dis-score)) and the dotplot (Figure \@ref(fig:leaf-health-dotplot1)) showing random effects estimates of the entry genotypes illustrate the relationship. Similarly, blocking factor nested column within columgroup has a significant contribution to the variation in the disease score trait.
+
+```{r leaf-health-meanconf-tab, results='asis'}
+# # Produces Differences of Least Squares Means (population means) table with p-values and Confidence intervals.
+leaf_health_diffmean <- map(.x = model_leaf_health,
+                      .f = ~ lmerTest::difflsmeans(as_lmerModLmerTest(.x), adjust = "tukey") %>%
+                        as_tibble(rownames = "Contrast"))
+
+leaf_health_diffmean[[1]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Disease score at zadok's stage 75 of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Leaf greenness score at Zadok's stage 65
+
+The LRT indicates that fixed effects due to check varieties have no significant effects on the leaf greenness score (p-value for $\chi^2$ statistic > 0.05). 
+
+Entry genotypes are significantly variable for the trait. ANOVA table (\@ref(tab:lrt-greenness1)) and the dotplot (Figure \@ref(fig:leaf-health-dotplot2)) showing random effects estimates of the entry genotypes illustrate the relationship. Blocking factors, on the other hand, do not have significant effects in the variation for trait.
+
+```{r leaf-health-meanconf-tab2, results='asis'}
+leaf_health_diffmean[[2]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Leaf greenness at zadok's stage 65 of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Leaf greenness score at Zadok's stage 75
+
+Genotypes show highly significant differences in the greenness score measured measured at Zadok's stage 75. LRT shows that both checks and entries possess significant ($\chi^2$ statistic=$32.828$ with $4\ df$) heritable variation. 
+
+Pairwise comparison of fixed effects estimate indicate that check variety Gautam and Bhrikuti are significantly different for the green appearence of the flag leaf. The lowest scores are for the check variety Gautam ($6.51\ (\pm\ 1.76)$) and the highest are for the Tilottama ($7.34\ (\pm\ 1.76)$) variety. Although, based on the qualitative description (Table \@ref(tab:leaf-greenness)), both can be characterized as having retained moderately green leaf coloration.
+
+Similarly noteworthy is the variation among the entry genotypes (significant at $p < 0.01$). A measure of random effects variance contributed by the genotypes is shown in ANOVA Table (\@ref(tab:lrt-greenness2)) and the dotplot (Figure \@ref(fig:leaf-health-dotplot3)) showing random effects estimates of the entry genotypes. Unlike entry effects, controlling for exraneous factors with blocking did not result in significant reduction in residual variance.
+
+```{r leaf-health-meanconf-tab3, results='asis'}
+leaf_health_diffmean[[3]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Leaf greenness at zadok's stage 75 of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Leaf greenness score at Zadok's stage 85
+
+Genotypes show highly significant differences in the greenness score measured measured at Zadok's stage 85. LRT shows that both checks and entries possess significant ($\chi^2$ statistic=$14.17$ with $4\ df$) heritable variation. 
+
+Pairwise comparison of fixed effects estimate indicate that check variety Aditya ($5.832\ (\pm\ 1.23)$) has the most green coloration of the flag leaf followed by Bhrikuti and Gautam (both have similar greenness scores) and Tilottama ($4.90\ (\pm\ 1.23)$). Based on the qualitative description (Table \@ref(tab:leaf-greenness)), both can be characterized as having retained moderate amounts of green color in leaf.
+
+Similarly noteworthy is the variation among the entry genotypes (significant at $p < 0.01$). A measure of random effects variance contributed by the genotypes is shown in ANOVA Table (\@ref(tab:lrt-greenness3)) and the dotplot (Figure \@ref(fig:leaf-health-dotplot4)) showing random effects estimates of the entry genotypes. Likewise, effect of blocking in the direction along colum nested inside column groups resulted in significant reduction of residual error variance.
+
+```{r leaf-health-meanconf-tab4, results='asis'}
+leaf_health_diffmean[[4]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Leaf greenness at zadok's stage 85 of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### LAUG between Zadok's stage 65 and 75
+
+The LRT indicates that fixed effects due to check varieties have no significant effects on the LAUG value (p-value for $\chi^2$ statistic > 0.05). 
+
+However, entry genotypes do represent a diverse collection with the trait tracing it's roots in genetic make up of the diverse germplam. ANOVA table (\@ref(tab:lrt-laug1)) and the dotplot (Figure \@ref(fig:leaf-health-dotplot21)) showing random effects estimates of the entry genotypes illustrate the relationship. To the contrary, no significant effects of blocking factors on the traits LAUG between zadok's stage 65 and 75 was discovered.
+
+```{r leaf-health-meanconf-tab5, results='asis'}
+leaf_health_diffmean[[5]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in LAUG during zadok's stage 65 to 75 of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### LAUG between Zadok's stage 75 and 85
+
+Genotypes show highly significant differences in the LAUG values for duration between Zadok's stage 75 and 85 (an indication of how much reduction in photosynthesis has occured do to decline in green pigmentation). LRT shows that both checks and entries possess significant ($\chi^2$ statistic=$21.63$ with $4\ df$) heritable variation. 
+
+Pairwise comparison of fixed effects estimate indicate that check variety Aditya suffered largest reduction in green pigmentation ($93.03\ (\pm\ 19.70)$), while Tilottama had the least ($77.35\ (\pm\ 19.71)$) loss of all check varieties.
+
+Likewise, variation among the entry genotypes (significant at $p < 0.01$) for the trait. A measure of random effects variance contributed by the genotypes is shown in ANOVA Table (\@ref(tab:lrt-laug2)) and the dotplot (Figure \@ref(fig:leaf-health-dotplot22)) showing random effects estimates of the entry genotypes. Similar to the approximation of LAUG between Zadok's stage 65 to 75, the effects of blocking factors is not realized to be significant either in approximating LAUG during a later period.
+
+```{r leaf-health-meanconf-tab6, results='asis'}
+leaf_health_diffmean[[6]] %>%
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>%
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>%
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in LAUG during zadok's stage 75 to 85 of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+<!-- ```{r leaf-health-meanconf-viz, fig.cap="Mean of leaf health traits compared across check varieties for fixed effect estimates with grouped standard errors shown as error bars", fig.subcap=c("Disease score of check varieties at Zadok's stage 75", "Leaf greenness score of check varieties at Zadok's stage 65", "Leaf greenness score of check varieties at Zadok's stage 75", "Leaf greenness score of check varieties at Zadok's stage 85", "LAUG of check varieties between Zadok's stage 65 and 75", "LAUG of check varieties between Zadok's stage 75 and 85"), fig.ncol = 2, fig.show="hold", out.width="0.48\\linewidth"} -->
+
+<!-- # # Produces Least Squares Means (population means) table with p-values and Confidence intervals. -->
+<!-- # leaf_health_mean <- map(.x = model_leaf_health,  -->
+<!-- #                   .f = ~ lmerTest::lsmeansLT(.x, "check_or_line", adjust = "tukey")) -->
+
+<!-- # # 95% model confidence interval bars -->
+<!-- # model_cin <- leaf_health_mean[[1]]$lsmeans.table %>% -->
+<!-- #   filter(!check_or_line == "line") %>% -->
+<!-- #   mutate(`Check variety` = c("Aditya", "Bhrikuti", "Gautam", "Tilottama")) %>% -->
+<!-- #   ggplot(aes(x=`Check variety`, y=Estimate, ymax=`Upper CI`, ymin=`Lower CI`, group=1)) + -->
+<!-- #   geom_col(fill="blue", -->
+<!-- #            color="grey70", width = 0.5) + -->
+<!-- #   geom_errorbar(position = position_dodge(0.9), width = 0.3) + -->
+<!-- #   labs(x = "Check variety", y = "Yield") + -->
+<!-- #   theme_bw() -->
+
+<!-- # # 95% manual confidence interval bars -->
+<!-- # manual_cin <- all_data %>%  -->
+<!-- #   select(check_or_line, dis_march15) %>%  -->
+<!-- #   filter(!check_or_line == "line") %>%  -->
+<!-- #   ggplot(aes(check_or_line, dis_march15)) + -->
+<!-- #   stat_summary(fun.y = "mean", geom = "bar",  -->
+<!-- #                position = position_dodge(0.8),  -->
+<!-- #                color = "grey70", fill = "skyblue",  -->
+<!-- #                width = 0.5) + -->
+<!-- #   stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.3) + -->
+<!-- #   labs(x = "Check variety", y = "Disease score (Zadok's stage 75)") +  -->
+<!-- #   theme_bw() + -->
+<!-- #   theme(text = element_text(size = 14)) -->
+
+<!-- # error bars -->
+
+<!-- manual_ebar_data <- map(c("dis_march15", "greenness_z65",  -->
+<!--                           "greenness_z75", "greenness_z85",  -->
+<!--                           "LAUG_65_75", "LAUG_75_85"),  -->
+<!--                    ~ all_data %>%  -->
+<!--   select(check_or_line, .x) %>%  -->
+<!--   group_by(check_or_line) %>% -->
+<!--   summarise_at(.x, funs(avg = mean(., na.rm = TRUE),  -->
+<!--                               sdev = sd(., na.rm = TRUE), rep = n())) %>% -->
+<!--   ungroup() %>%  -->
+<!--   mutate(lower_err = avg-(sdev/sqrt(rep)),  -->
+<!--          upper_err = avg+(sdev/sqrt(rep))) %>%  -->
+<!--   filter(!check_or_line == "line") %>%  -->
+<!--   mutate(check_or_line = factor(check_or_line,  -->
+<!--                                 labels = c("Aditya", "Bhrikuti", "Gautam", "Tilottama")))) -->
+
+<!-- walk2(.x = manual_ebar_data,  -->
+<!--       .y = c("Disease score at zadok stage 75", -->
+<!--              "Leaf greenness score at zadok stage 65", -->
+<!--              "Leaf greenness score at zadok stage 75", -->
+<!--              "Leaf greenness score at zadok stage 85", -->
+<!--              "LAUG during zadok stage 67-75", -->
+<!--              "LAUG during zadok stage 67-85"),  -->
+<!--       ~ print(.x %>%  -->
+<!--                 ggplot(aes(x=check_or_line, y=avg,  -->
+<!--                            ymax=upper_err, ymin=lower_err, group=1)) + -->
+<!--                 geom_col(fill="lightblue",  -->
+<!--                          color="grey70", width = 0.4) + -->
+<!--                 geom_errorbar(position = position_dodge(0.9), width = 0.3) + -->
+<!--                 labs(x = "Check variety", y = .y) +  -->
+<!--                 theme_bw() + -->
+<!--                 theme(text = element_text(size = 14)))) -->
+<!-- ``` -->
+
+
+### Mean comparison of leaf health traits of entry genotypes
+
+```{r leaf-health-blup-viz, fig.cap="Scatterplot of observed versus BLUP values of leaf health traits", fig.subcap=c("Disease score (Zadok stage 75)", "Leaf greenness (Zadok stage 65)", "Leaf greenness (Zadok stage 75)", "Leaf greenness (Zadok stage 85)", "LAUG (Zadok stage 65 to 75)", "LAUG (Zadok stage 75 to 85)"), fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE}
+
+# obtain random effect intercepts and the summary of variance of fixed and random terms
+genotype_blups <- map2(.x = model_leaf_health, 
+                      .y = c("dis_march15", "greenness_z65", 
+                                       "greenness_z75", "greenness_z85", 
+                                       "LAUG_65_75", "LAUG_75_85"),
+                      .f = ~ lme4::ranef(.x) %>% 
+                        purrr::pluck(1) %>% 
+                        rownames_to_column(var = "Entry genotype") %>% 
+                        rename_at(2, ~ "BLUP") %>% 
+                        filter(!`Entry genotype` == "check") %>% 
+                        left_join(all_data %>% 
+                                    select(lin_check, is_line, .y) %>% 
+                                    filter(is_line == "1", !(is.na(get(.y)))) %>% 
+                                    select(-is_line), by = c("Entry genotype"="lin_check")))
+
+walk2(.x = genotype_blups, 
+      .y = c("Disease score (Zadok stage 75)", 
+             "Leaf greenness (Zadok stage 65)", 
+             "Leaf greenness (Zadok stage 75)", 
+             "Leaf greenness (Zadok stage 85)", 
+             "LAUG (Zadok stage 65 to 75)", 
+             "LAUG (Zadok stage 75 to 85)"),
+    .f = ~  (ggplot(aes(x = BLUP, y = .x[,3]), data = .x) +
+      geom_point() + ylab(.y)) %>% print())
+
+```
+
+
+Scatterplot showing observed mean leaf health traits plotted against their respective genotypic BLUP values is presented in Figure \@ref(fig:leaf-health-blup-viz).
+
+```{r leaf-health-fitted-obs-cor}
+
+mean_leaf_health_fitted <- fitted_leaf_health %>% 
+  select(-Genotype)
+
+mean_leaf_health_observed <- all_data %>% 
+  select(c("dis_march15", "greenness_z65", 
+           "greenness_z75", "greenness_z85", 
+           "LAUG_65_75", "LAUG_75_85"))
+
+randdet <- map2_dbl(.x = mean_leaf_health_fitted, 
+                    .y = mean_leaf_health_observed,
+                    .f = ~ (cor(unclass(.x), unclass(.y), 
+                                use = "pairwise.complete.obs"))^2)
+```
+
+
+The coefficient of determination, as computed by squared correlation coefficient between the observed and fitted values of random effects model are `r randdet %>% round(digits = 2) %>% paste(collapse = ", ")`, respectively for the Disease score at Zadok's stage 75, Leaf greenness Zadkok's stage 65, Leaf greenness Zadok's stage 75, Leaf greenness Zadok's stage 85, LAUG during Zadok's stage 65 to 75 and LAUG during Zadok's stage 75 to 85.
+
+```{r leaf-health-dotplot, fig.cap="Random effect estimates of leaf health traits of entry genotypes", fig.subcap=c("Disease score (Zadok stage 75)", "Leaf greenness (Zadok stage 65)", "Leaf greenness (Zadok stage 75)", "Leaf greenness (Zadok stage 85)"), fig.keep='all', fig.width=7, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.asp = 1.2, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE}
+
+# remove_check_ranef <- function(x){
+#   y <- x;
+#   y$line_or_check <- y$line_or_check %>% 
+#     rownames_to_column("rn") %>% 
+#     slice(-1) %>% 
+#     column_to_rownames("rn") %>% 
+#     as.data.frame();
+#   return(y)
+# }
+
+random_effs <- map(.x = model_leaf_health, 
+                   .f = ~  ranef(.x, condVar = TRUE))
+qq <- map(.x = random_effs, 
+          .f = ~ attr(.x[[1]], "postVar")[-1])
+       
+df <- map2(.x = random_effs, 
+           .y = qq,
+           .f = ~ data.frame(Intercepts = .x$line_or_check[,1][-1], # remove first intercept ("Check")
+                        sd.intercept = 2*sqrt(.y[1:length(.y)]), 
+                        level_names = rownames(.x$line_or_check)[-1]) %>% 
+         mutate(level_p_shapes = as.factor(if_else(Intercepts>0, 1, 16)))) #scale_shape_manual point shapes (1 and 16)
+
+walk(.x = df[1:4], 
+     .f = ~ print(.x %>% 
+       ggplot(aes(level_names,Intercepts,shape=level_p_shapes)) +
+       geom_hline(yintercept=0) + # horizontal line
+       geom_errorbar(aes(ymin=Intercepts-sd.intercept, # error bars
+                         ymax=Intercepts+sd.intercept), width=0,color="black") + 
+       geom_point(aes(size=2)) + # point size 2
+       guides(size=FALSE,shape=FALSE) + # remove legends
+       # scale_shape_manual(values=rep(c(1,16), each = 34)) + # not necessary
+       theme_bw() +
+       xlab("Levels") + 
+       ylab("") +
+       theme(axis.text.x=element_text(size=rel(1.2)),
+             axis.title.x=element_text(size=rel(1.3)),
+             axis.text.y=element_text(size=rel(1)),
+             panel.grid.minor=element_blank(),
+             panel.grid.major.x=element_blank()) +
+       coord_flip())
+)
+```
+
+
+```{r leaf-health-dotplot2, fig.cap="Random effect estimates of leaf health traits of entry genotypes (...continued)", fig.subcap=c("LAUG (Zadok stage 65 to 75)", "LAUG (Zadok stage 75 to 85)"), fig.keep='all', fig.width=7, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.asp = 1.2, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE}
+
+walk(.x = df[5:6], 
+     .f = ~ print(.x %>% 
+       ggplot(aes(level_names,Intercepts,shape=level_p_shapes)) +
+       geom_hline(yintercept=0) + # horizontal line
+       geom_errorbar(aes(ymin=Intercepts-sd.intercept, # error bars
+                         ymax=Intercepts+sd.intercept), width=0,color="black") + 
+       geom_point(aes(size=2)) + # point size 2
+       guides(size=FALSE,shape=FALSE) + # remove legends
+       # scale_shape_manual(values=rep(c(1,16), each = 34)) + # not necessary
+       theme_bw() +
+       xlab("Levels") + 
+       ylab("") +
+       theme(axis.text.x=element_text(size=rel(1.2)),
+             axis.title.x=element_text(size=rel(1.3)),
+             axis.text.y=element_text(size=rel(1)),
+             panel.grid.minor=element_blank(),
+             panel.grid.major.x=element_blank()) +
+       coord_flip())
+)
+```
+
+\clearpage

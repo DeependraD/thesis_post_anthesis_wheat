@@ -1,0 +1,15 @@
+# Leaf greenness score based on proportion of non-chlorotic and non-necrotic leaf area.,
+# Foliar pathogen associated leaf disease score on 0-9 scale(recorded as leaf_health),
+greenness_score,score_rating
+non-green,
+moderately non-green,
+moderately green,
+green,
+,
+fpa_leaf_score,score_rating
+"""0-1""",very less affected
+"""2-3""",less affected
+"""4-5""",mildly affected
+"""5-7""",mildly unaffected
+"""7-8""",much affected
+"""8-9""",very much affected

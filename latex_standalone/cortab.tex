@@ -1,0 +1,86 @@
+\documentclass{article}
+\usepackage[top=1cm,bottom=1.25cm,left=1.25cm,right=1.25cm]{geometry}
+\usepackage{graphicx,latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb,amsthm}
+\usepackage{longtable,booktabs,setspace}
+\usepackage{chemarr}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage{float}
+\floatplacement{figure}{H}
+\usepackage{rotating}
+\usepackage[parfill]{parskip}
+\usepackage{tikz}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage[normalem]{ulem}
+\usepackage[T1]{fontenc}
+\newcommand{\blandscape}{\begin{landscape}}
+\newcommand{\elandscape}{\end{landscape}}
+\usepackage{subcaption}
+\newcommand{\subfloat}[2][need a sub-caption]{\subcaptionbox{#1}{#2}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\begin{document}
+\pagenumbering{gobble}
+\blandscape
+\begin{table}
+
+\caption{\label{tab:plot-starred-corr}Correlation coefficients of numeric response variables observed in study}
+\centering
+\resizebox{\linewidth}{!}{\fontsize{13}{15}\selectfont
+\begin{threeparttable}
+\begin{tabular}[t]{>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}lllllllll}
+\toprule
+\textbf{ } & \textbf{Yild} & \textbf{Paen} & \textbf{ThWt} & \textbf{Gran} & \textbf{Efer} & \textbf{Di75} & \textbf{Gr65} & \textbf{Gr75} & \textbf{Gr85} & \textbf{La75} & \textbf{La85} & \textbf{Plht} & \textbf{Laar} & \textbf{Cttd} & \textbf{Spdi} & \textbf{Spii} & \textbf{Daad}\\
+\midrule
+Yild &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+Paen & 0.13 &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+ThWt & 0.18* & -0.12 &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+Gran & 0.32**** & 0.41**** & -0.06 &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+Efer & 0.56**** & -0.06 & -0.01 & -0.03 &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace
+Di75 & -0.07 & -0.17* & 0.03 & -0.05 & -0.06 &  &  &  &  &  &  &  &  &  &  &  & \\
+Gr65 & -0.10 & -0.09 & 0.06 & -0.01 & 0.10 & -0.14* &  &  &  &  &  &  &  &  &  &  & \\
+Gr75 & 0.10 & 0.20** & -0.12 & 0.18** & -0.19** & -0.18** & -0.07 &  &  &  &  &  &  &  &  &  & \\
+Gr85 & 0.06 & 0.12 & -0.04 & 0.07 & -0.10 & -0.15* & 0.37**** & 0.77**** &  &  &  &  &  &  &  &  & \\
+La75 & 0.34**** & 0.19** & -0.10 & 0.20** & 0.07 & -0.16* & 0.17** & 0.82**** & 0.75**** &  &  &  &  &  &  &  & \\
+\addlinespace
+La85 & 0.08 & 0.12 & -0.01 & 0.02 & -0.16* & -0.14* & 0.13 & 0.87**** & 0.85**** & 0.76**** &  &  &  &  &  &  & \\
+Plht & -0.10 & 0.09 & -0.12 & 0.05 & -0.11 & -0.09 & 0.00 & 0.11 & 0.12 & 0.07 & 0.06 &  &  &  &  &  & \\
+Laar & -0.04 & 0.18** & 0.05 & 0.10 & -0.02 & -0.08 & -0.11 & 0.10 & 0.03 & 0.08 & 0.07 & 0.11 &  &  &  &  & \\
+Cttd & 0.08 & -0.19** & 0.07 & -0.05 & 0.13* & -0.10 & 0.00 & -0.20** & -0.14* & -0.17** & -0.15* & 0.03 & -0.02 &  &  &  & \\
+Spdi & 0.22** & 0.11 & 0.13 & 0.16* & -0.03 & -0.22** & 0.10 & 0.18** & 0.18** & 0.19** & 0.19** & -0.11 & 0.04 & -0.08 &  &  & \\
+\addlinespace
+Spii & 0.05 & 0.26**** & -0.02 & 0.14* & 0.02 & -0.41**** & 0.05 & 0.17** & 0.14* & 0.14* & 0.15* & 0.23** & 0.11 & 0.08 & 0.26**** &  & \\
+Daad & -0.13 & -0.07 & 0.25** & -0.12 & 0.04 & -0.06 & 0.30**** & -0.45**** & -0.17** & -0.29**** & -0.31**** & 0.11 & 0.07 & 0.18** & 0.13* & 0.24** & \\
+Dath & -0.13 & -0.11 & 0.23** & -0.18** & 0.07 & -0.10 & 0.29**** & -0.45**** & -0.17** & -0.29**** & -0.29**** & 0.08 & 0.08 & 0.24** & 0.09 & 0.26**** & 0.93****\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textbf{Note: } 
+\item p < .0001: **** ; p < .001: *** ; p < .01: ** ; p < .05: * 
+                       \newline Yild: Yield, Paen: Panicle length, 
+                       \newline ThWt: Thousand kernel weight, Gran: Number of grains per panicle,
+                       \newline Efer: Number of effective tillers, Di75: Disease score at Z75, 
+                       \newline Gr65: Greenness score at Z65, Gr75: Greenness score at Z75, 
+                       \newline Gr85: Greenness score at Z85, La75: LAUG score at Z75, 
+                       \newline La85: LAUG score at Z85, Plht: Plant height, 
+                       \newline Laar: Leaf area, Cttd: Canopy temperature depression, 
+                       \newline Spdi: SPAD score at Z65, Spii: SPAD score at Z85, 
+                       \newline Daad: Days to heading
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}
+\elandscape
+\end{document}

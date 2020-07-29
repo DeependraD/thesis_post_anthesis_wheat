@@ -1,0 +1,444 @@
+---
+title: "Designing Field Experimental Plot"
+author: "Deependra Dhakal"
+date: "November 13, 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Some helpful designs for reference.
+Only 16 genotypes will be used to create a lattice.  
+
+```{r include = FALSE}
+library(agricolae)
+```
+Following two types of designs, may be the most efficient ones:  
+-Triple lattice  
+-Alpha lattice  
+
+We can generate a triple lattice design for the 4 x 4 design. Thus the resulting design makes use of 16 genotypes.
+```{r echo = FALSE}
+lattice4_4 <- design.lattice(trt = paste("wheat_gen", seq(1:16), sep = ""), r = 3, serie = 2, seed = 123, randomization = T)
+```
+
+We can generate an alpha design with 20 genotypes, keeping block size 4, thus resulting number of blocks to 5.
+```{r echo = FALSE}
+entries <- (paste("wheat_gen", seq(1:20), sep = ""))
+alpha4_4 <- design.alpha(trt = entries, r = 3, k = 4, serie = 2, seed = 123, randomization = TRUE)
+```
+
+```{r include=FALSE}
+# This will load the agridat package to obtain agriculture research related datasets.
+require(agridat)
+```
+
+## Plots(for Alpha design only)
+
+Simple graph with useful visualization of the layout. Here numbers inside the individual cells represent plot number:  
+
+```{r}
+desplot(entries ~ block+cols, alpha4_4$book, out1 = replication, num = plots, out1.gpar = list(col = "black", lwd = 0.75, lty = 2), show.key = FALSE, main = "Alpha Lattice design with K*S = 4*5", cex = 0.75)
+```
+
+Following graphs helps visualize entrywise plan of the experimental layout:  
+
+```{r echo = FALSE, warning=FALSE}
+desplot(entries ~ block+cols, alpha4_4$book, text=entries, cex=1, out1=block, out2 = replication, out1.gpar=list(col = "gray50", lwd = 1.5, lty = 1))
+
+```
+
+The above plot is more informative than the previous one. But still, some tweaks might be lacking just to get it perfect.  
+
+The plot shown below is useful, after the completion of research, to help integrate layout with the field data generated during the course of study.  
+
+```{r echo = FALSE, warning=FALSE}
+# Let's generate a random data to use as quantative trait(response variable) and bind that to our field book.
+quantitative <- rnorm(n = 60, mean = 100, sd = 12)
+alpha4_4$book <- cbind(alpha4_4$book, quantitative)
+
+desplot(form = quantitative ~ cols + block, alpha4_4$book, out1 = replication)
+```
+
+It depics the measure of the Quantitative variable in the whole experiment data.  
+
+The following example fits an Alpha lattice model with fixed effects block, genotype and replication effects. Plot a heatmap of the residuals.  
+
+```{r echo=FALSE, warning=FALSE}
+m1 <- lm(quantitative ~ block + entries + replication, alpha4_4$book) # Standard RCB model
+alpha4_4$book$res <- resid(m1)
+desplot(res ~ block + cols, alpha4_4$book, text=entries, cex=0.75,
+        main="Quantitative, a response, variable's residuals from Alpha lattice model")
+```
+
+## Data Visualization using ggplot and dependencies  
+
+```{r echo=FALSE}
+library(ggplot2)
+ggplot(alpha4_4$book, aes(entries, quantitative)) +
+geom_point() + geom_smooth(span = 1)
+```
+
+# The Augmented Block Design for Karnal Bunt Screening of Wheat  
+These are designs for two types of treatments: the control treatments (common) and the increased treatments. The common treatments are applied in complete randomized blocks, and the increased treatments, at random. Each treatment should be applied in any block once only. It is understood that the common treatments are of a greater interest; the standard error of the difference is much smaller than when between two increased ones in different blocks. The function design.dau() achieves this purpose and its parameters are:  
+
+## Let's compare two schemes with "4" and "5" replications:  
+
+### First, with replications = 4  
+
+```{r echo = FALSE}
+trt1 <- c("check1", "check2", "check3", "check4")
+trt2 <- paste("line", seq(from = 1, to = 108, by = 1 ), sep = "")
+outdesign_1 <- design.dau(trt1, trt2, r=4, seed=543, serie=2)
+fieldbook_1 <- outdesign_1$book
+```
+
+In the following dataframe, I have arbitrarily assigned each plot to a row factor.Now, let's visualize the layout:  
+
+```{r echo=FALSE, warning=FALSE}
+with(fieldbook_1, by(trt, block, as.character)) # See how the treatments will be distributed by block
+
+length(with(fieldbook_1, by(trt, block, as.character))[[1]]) # "1" represents the 1st block. Each block has the same length.
+
+fieldbook_11 <- cbind(row = as.vector(rep(1:31, times = 4)), fieldbook_1)
+
+desplot(form = trt ~ block*row, data = fieldbook_11, show.key = FALSE, out1 = trt, text = trt, cex = 1, out1.gpar = list(col = "grey", lwd = 2), flip = FALSE, main = "One- way Augmented Block Design with 4 Replications", shorten = "no")
+```
+
+
+### Then, with replication = 5  
+
+```{r echo=FALSE}
+trt1 <- c("check1", "check2", "check3", "check4")
+trt2 <- paste("line", seq(from = 1, to = 108, by = 1 ), sep = "")
+outdesign_2 <- design.dau(trt1, trt2, r=5, seed=543, serie=2)
+fieldbook_2 <- outdesign_2$book
+```
+
+In the following dataframe, I have arbitrarily assigned each plot to a row factor.Now, let's visualize the layout:  
+
+```{r echo=FALSE, warning=FALSE}
+with(fieldbook_2, by(trt, block, as.character))
+lapply(X = with(fieldbook_2, by(trt, block, as.character)), FUN = length)
+
+fieldbook_21 <- cbind(row = as.vector(c(rep(1:26, times = 3), rep(1:25, times = 2))), fieldbook_2)
+
+desplot(form = trt ~ block*row, data = fieldbook_21, show.key = FALSE, out1 = trt, text = trt, cex = 1, out1.gpar = list(col = "grey", lwd = 2), flip = FALSE, main = "One- way Augmented Block Design with 5 Replications", shorten = "no")
+```
+
+# Template optimization scheme  
+
+## For a 160 plots design  
+Let us define following variables, for the sake of illustration:  
+*k* = number of rows  
+*s* = number of columns  
+*g*~k~ = number of superblock rows  
+*g*~s~ = number of superblock columns  
+*k*~b~ = number of rows in a block  
+*s*~b~ = number of columns in a block  
+*p*~[i, j]~ = number of check plots in (i, j)^th^ plot  
+
+With a most basic design having complete blocks, number of unreplicated varieties that can be tested with the following equation:  
+ve_raw <- k*s - (gk * gs * pb)  
+k <- sum(kb)  
+s <- sum(sb)
+
+An augmented row–column design for the specification (*v*~c~, *g*~k~, *g*~s~, *k*~b, *s*~b, *p*~b) = (4, 4, 3, 5(constant), ?, 4) is provided below. The *v*~e~ (? Number) unreplicated entries are allocated to the empty cells. There are ? plots allocated to the check cultivars and (? Number) plots overall.  
+
+## Let's check the viability of our treatment combinations in a row-column design
+
+```{r}
+vc <- 4 # number of replicated checks
+ve <- 108 # number of unreplicated vars
+gk <- 5 # number of grouped rows
+gs <- 2 # number of grouped columns
+pb <- 4 # number of plots with checks in each rectangular block(here, constant)
+```
+
+Let's take a scheme with following specifications for number of rows in ith (1 to 4; later in the design matrix creation referred to as: A, B, C, D) superblock row.
+
+```{r}
+kb1 <- 5; kb2 <- 5; kb3 <- 5; kb4 <- 5
+```
+
+Or, alternatively we can make use of vectorized structure to indicate the row composition of individual blocks constrained by superblock row.
+
+```{r}
+kb <- c(4, 4, 4, 4, 4)
+```
+
+For the procedure we require a design matrix/dataframe, which is herby called pbgs(for pb:plots in a block and gs:design matrix for ith superrow). It can be constructed as:
+
+```{r}
+pbgs <- matrix(data = c(rep(c("A", "B", "C", "D", "E"), each = 2), vector(length = 10)), byrow = FALSE, ncol = 2)
+colnames(pbgs) <- c("superrow_class", "num_plots")
+pbgs <- as.data.frame(pbgs)
+pbgs$num_plots <- as.numeric(rep(c(4, 4), each = 5))
+```
+
+Now, Optimization function for ith superrow to be viable is:
+
+```{r}
+(1 + (vc - 1) + (gs - 1) + (kb - 1)) <= aggregate(num_plots ~ superrow_class, pbgs, sum)[, 2]
+```
+
+Continuing with the scheme, we validate the feasibility of superblock column with similar optimization function.
+
+To start with, we define the sb which is the column compostion of individual blocks constrainted by superblock column in a vectorized structure:
+
+```{r}
+sb <- c(4, 4)
+```
+
+Again, we initialize with a design matrix, here called pbgk:
+
+```{r}
+pbgk <- matrix(data = c(rep(c("X", "Y"), each = 5), vector(length = 10)), byrow = FALSE, ncol = 2)
+colnames(pbgk) <- c("supercol_class", "num_plots")
+pbgk <- as.data.frame(pbgk)
+pbgk$num_plots <- as.numeric(rep(c(4, 4, 4, 4, 4), each = 2))
+```
+
+Optimization function for jth supercolumn to be viable is:
+
+```{r}
+(1 + (vc - 1) + (gk - 1) + (sb - 1)) <= aggregate(num_plots ~ supercol_class, pbgk, sum)[, 2]
+```
+
+
+# Augmented Block Design for small number of checks: Superimposed blocks design  
+
+Let us define following variables, for the sake of illustration:  
+*k* = number of rows  
+*s* = number of columns  
+*g*~k~ = number of superblock rows  
+*g*~s~ = number of superblock columns  
+*k*~b~ = number of rows in a block  
+*s*~b~ = number of columns in a block  
+*p*~[i, j]~ = number of check plots in (i, j)^th^ plot  
+
+With a most basic design having complete blocks, number of unreplicated varieties that can be tested with the following equation:  
+ve_raw <- k*s - (gk * gs * pb)  
+k <- sum(kb)  
+s <- sum(sb) # ????
+
+An augmented row–column design for the specification (*v*~c~, *g*~k~, *g*~s~, *k*~b, *s*~b, *p*~b) = (4, 4, 3, 5(constant), ?, 4) is provided below. The *v*~e~ (? Number) unreplicated entries are allocated to the empty cells. There are ? plots allocated to the check cultivars and (? Number) plots overall.  
+
+## Let's check the viability of our treatment combinations in a row-column design
+
+```{r}
+vc <- 4 # number of replicated checks
+ve <- 108 # number of unreplicated vars
+gk <- 4 # number of grouped rows
+gs <- 3 # number of grouped columns
+pb <- 4 # number of plots with checks in each rectangular block(here, constant)
+```
+
+Let's take a scheme with following specifications for number of rows in ith (1 to 4; later in the design matrix creation referred to as: A, B, C, D) superblock row.
+
+```{r}
+kb1 <- 5; kb2 <- 5; kb3 <- 5; kb4 <- 5
+```
+
+Or, alternatively we can make use of vectorized structure to indicate the row composition of individual blocks constrained by superblock row.
+
+```{r}
+kb <- c(5, 5, 5, 5)
+```
+
+For the procedure we require a design matrix/dataframe, which is herby called pbgs(for pb:plots in a block and gs:design matrix for ith superrow). It can be constructed as:
+
+```{r}
+pbgs <- matrix(data = c(rep(c("A", "B", "C", "D"), each = 3), vector(length = 12)), byrow = FALSE, ncol = 2)
+colnames(pbgs) <- c("superrow_class", "num_plots")
+pbgs <- as.data.frame(pbgs)
+pbgs$num_plots <- as.numeric(rep(c(4, 4, 4), each = 4))
+```
+
+Now, Optimization function for ith superrow to be viable is:
+
+```{r}
+(1 + (vc - 1) + (gs - 1) + (kb - 1)) <= aggregate(num_plots ~ superrow_class, pbgs, sum)[, 2]
+```
+
+Continuing with the scheme, we validate the feasibility of superblock column with similar optimization function.
+
+To start with, we define the sb which is the column compostion of individual blocks constrainted by superblock column in a vectorized structure:
+
+```{r}
+sb <- c(4, 4, 4)
+```
+
+Again, we initialize with a design matrix, here called pbgk:
+
+```{r}
+pbgk <- matrix(data = c(rep(c("X", "Y", "Z"), each = 4), vector(length = 12)), byrow = FALSE, ncol = 2)
+colnames(pbgk) <- c("supercol_class", "num_plots")
+pbgk <- as.data.frame(pbgk)
+pbgk$num_plots <- as.numeric(rep(c(4, 4, 4), each = 4))
+```
+
+Optimization function for jth supercolumn to be viable is:
+
+```{r}
+(1 + (vc - 1) + (gk - 1) + (sb - 1)) <= aggregate(num_plots ~ supercol_class, pbgk, sum)[, 2]
+```
+
+Loading a custom design provided by Prof. Hans Peter and getting it in correct structural class has been achieved as follows:  
+```{r echo=FALSE}
+dhakal_peter <- structure(list(trt = structure(c(24L, 111L, 2L, 3L, 4L, 49L, 
+1L, 29L, 2L, 103L, 1L, 110L, 2L, 1L, 68L, 4L, 67L, 2L, 10L, 1L, 
+11L, 93L, 4L, 3L, 3L, 65L, 4L, 97L, 1L, 12L, 2L, 109L, 4L, 2L, 
+37L, 1L, 1L, 4L, 35L, 2L, 84L, 1L, 4L, 3L, 112L, 2L, 28L, 83L, 
+4L, 51L, 2L, 1L, 1L, 69L, 3L, 2L, 36L, 61L, 3L, 96L, 1L, 79L, 
+77L, 75L, 46L, 2L, 3L, 4L, 89L, 4L, 62L, 1L, 105L, 2L, 3L, 2L, 
+3L, 104L, 76L, 38L, 1L, 4L, 47L, 1L, 60L, 1L, 82L, 20L, 4L, 3L, 
+19L, 4L, 1L, 98L, 3L, 2L, 2L, 39L, 1L, 4L, 106L, 100L, 2L, 71L, 
+9L, 3L, 17L, 3L, 4L, 63L, 1L, 55L, 3L, 2L, 22L, 81L, 3L, 50L, 
+2L, 16L, 59L, 2L, 3L, 1L, 27L, 73L, 91L, 3L, 1L, 57L, 8L, 4L, 
+64L, 3L, 43L, 5L, 2L, 3L, 1L, 4L, 87L, 1L, 2L, 107L, 58L, 3L, 
+1L, 108L, 2L, 3L, 88L, 2L, 4L, 4L, 14L, 21L, 4L, 4L, 31L, 78L, 
+2L, 52L, 1L, 13L, 45L, 86L, 1L, 3L, 26L, 1L, 3L, 3L, 18L, 4L, 
+4L, 70L, 32L, 2L, 2L, 41L, 2L, 72L, 7L, 1L, 56L, 4L, 102L, 3L, 
+2L, 66L, 3L, 4L, 90L, 4L, 101L, 3L, 3L, 74L, 25L, 1L, 4L, 1L, 
+42L, 2L, 3L, 85L, 2L, 15L, 4L, 23L, 33L, 1L, 80L, 3L, 53L, 4L, 
+1L, 6L, 34L, 54L, 94L, 1L, 4L, 95L, 2L, 3L, 4L, 99L, 30L, 3L, 
+4L, 2L, 40L, 4L, 2L, 48L, 3L, 44L, 1L, 92L), .Label = c("1", 
+"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", 
+"14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", 
+"25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", 
+"36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", 
+"47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", 
+"58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", 
+"69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", 
+"80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", 
+"91", "92", "93", "94", "95", "96", "97", "98", "99", "100", 
+"101", "102", "103", "104", "105", "106", "107", "108", "109", 
+"110", "111", "112"), class = "factor"), row = structure(c(1L, 
+1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 
+2L, 2L, 2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 
+3L, 3L, 3L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 5L, 
+5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 6L, 6L, 6L, 6L, 6L, 
+6L, 6L, 6L, 6L, 6L, 6L, 6L, 7L, 7L, 7L, 7L, 7L, 7L, 7L, 7L, 7L, 
+7L, 7L, 7L, 8L, 8L, 8L, 8L, 8L, 8L, 8L, 8L, 8L, 8L, 8L, 8L, 9L, 
+9L, 9L, 9L, 9L, 9L, 9L, 9L, 9L, 9L, 9L, 9L, 10L, 10L, 10L, 10L, 
+10L, 10L, 10L, 10L, 10L, 10L, 10L, 10L, 11L, 11L, 11L, 11L, 11L, 
+11L, 11L, 11L, 11L, 11L, 11L, 11L, 12L, 12L, 12L, 12L, 12L, 12L, 
+12L, 12L, 12L, 12L, 12L, 12L, 13L, 13L, 13L, 13L, 13L, 13L, 13L, 
+13L, 13L, 13L, 13L, 13L, 14L, 14L, 14L, 14L, 14L, 14L, 14L, 14L, 
+14L, 14L, 14L, 14L, 15L, 15L, 15L, 15L, 15L, 15L, 15L, 15L, 15L, 
+15L, 15L, 15L, 16L, 16L, 16L, 16L, 16L, 16L, 16L, 16L, 16L, 16L, 
+16L, 16L, 17L, 17L, 17L, 17L, 17L, 17L, 17L, 17L, 17L, 17L, 17L, 
+17L, 18L, 18L, 18L, 18L, 18L, 18L, 18L, 18L, 18L, 18L, 18L, 18L, 
+19L, 19L, 19L, 19L, 19L, 19L, 19L, 19L, 19L, 19L, 19L, 19L, 20L, 
+20L, 20L, 20L, 20L, 20L, 20L, 20L, 20L, 20L, 20L, 20L), .Label = c("1", 
+"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", 
+"14", "15", "16", "17", "18", "19", "20"), class = "factor"), 
+    rowgroup = structure(c(1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+    1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+    1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+    1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 2L, 
+    2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 
+    2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 
+    2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 
+    3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 
+    3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 
+    3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 
+    4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 
+    4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 
+    4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 
+    4L, 4L, 4L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 
+    5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 
+    5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 
+    5L, 5L, 5L, 5L, 5L, 5L), .Label = c("1", "2", "3", "4", "5"
+    ), class = "factor"), col = structure(c(1L, 2L, 3L, 4L, 5L, 
+    6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 
+    8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 
+    10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 
+    12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 
+    2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 
+    4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 
+    6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 
+    8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 
+    10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 
+    12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 
+    2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 
+    4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 
+    6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 
+    8L, 9L, 10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 
+    10L, 11L, 12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 
+    12L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 1L, 
+    2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L), .Label = c("1", 
+    "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"), class = "factor"), 
+    colgroup = structure(c(1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 
+    4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 
+    1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 
+    2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 
+    3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 
+    4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 
+    1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 
+    2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 
+    3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 
+    4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 
+    1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 
+    2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 
+    3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 
+    4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 
+    1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 
+    2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 1L, 1L, 1L, 2L, 2L, 2L, 
+    3L, 3L, 3L, 4L, 4L, 4L), .Label = c("1", "2", "3", "4"), class = "factor")), .Names = c("trt", 
+"row", "rowgroup", "col", "colgroup"), row.names = c(NA, -240L
+), class = "data.frame")
+```
+
+Plotting the layout of the design, we have:  
+
+```{r echo=FALSE, warning=FALSE}
+desplot(form = trt ~ row * col, data = dhakal_peter, out1 = rowgroup, out2 = colgroup, show.key = FALSE, text = trt, cex = 0.8, out1.gpar = list(col = "black", lwd = 2), out2.gpar = list(col = "black", lwd = 2), main = "A row-col design of Experimental Layout")
+```
+  
+Yet, A proper data class can be obtained from lin_check column, for plotting.  
+
+```{r echo = FALSE, warning = FALSE}
+desplot(form = lin_check ~ row * col, data = dhakal, out1 = rowgroup, out2 = colgroup, show.key = FALSE, text = lin_check, cex = 0.8, out1.gpar = list(col = "black", lwd = 2), out2.gpar = list(col = "black", lwd = 2), main = "Field Plot Layout in Augmented Block Design", shorten = "no")
+
+```
+  
+## To create a simple heat map of the field showing the temeperature status.  
+The object- colmayfix, replaces col.regions value.
+```{r}
+colmayfix <- colorRampPalette(c("blue", "gray", "red"))(15)
+dhakal <- read.csv("dhakal_field_entered3.csv", header = TRUE, na.strings = c("NA", "na", "-"))
+
+desplot(form = temp_degree_c ~ row * col, data = dhakal,
+        out1 = rowgroup, out2 = colgroup, show.key = FALSE, 
+        text = lin_check, cex = 0.8, out1.gpar = list(col = "black", lwd = 2), 
+        out2.gpar = list(col = "black", lwd = 2),
+        main = "Temperature profile of the field with available data 1 DAS", 
+        shorten = "no", col.regions = rev(RedGrayBlue(15)))
+```
+
+## Standing plant population of the field at 20th day of sowing.
+
+```{r}
+desplot(form = plant_pop ~ row * col, data = dhakal, out1 = rowgroup, out2 = colgroup, show.key = FALSE, text = lin_check, cex = 0.8, out1.gpar = list(col = "black", lwd = 2), out2.gpar = list(col = "black", lwd = 2),
+main = "Plant Population stand of the field (20 DAS)", shorten = "no", col.regions = rev(RedGrayBlue(10)))
+```
+
+## Insect damage profile of the field at 20th day of sowing.
+
+```{r}
+desplot(form = insect_resistance ~ row * col, data = dhakal, out1 = rowgroup, out2 = colgroup, show.key = FALSE, text = lin_check, cex = 0.8, out1.gpar = list(col = "black", lwd = 2), out2.gpar = list(col = "black", lwd = 2),
+main = "Insect Resistance profile of the field (20 DAS)", shorten = "no", col.regions = rev(RedGrayBlue(10)))
+```
+
+## Sowing sparness profile of the field plots.
+
+```{r}
+desplot(form = sparseness ~ row * col, data = dhakal, out1 = rowgroup, out2 = colgroup, show.key = FALSE, text = lin_check, cex = 0.8, out1.gpar = list(col = "black", lwd = 2), out2.gpar = list(col = "black", lwd = 2),
+main = "Sowing Sparseness profile of the field (20 DAS)", shorten = "no", col.regions = rev(RedGrayBlue(10)))
+```
+
+

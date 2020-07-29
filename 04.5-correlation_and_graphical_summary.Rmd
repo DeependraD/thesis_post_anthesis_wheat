@@ -1,0 +1,627 @@
+<!-- ### Aggregate growth stages of all genotypes at specific dates -->
+
+<!-- ```{r cor-graph-barplot-viz, fig.cap = "Growth progress of genotypes at different dates", fig.subcap=paste("Growth stage at", strptime(str_subset(colnames(all_data), "^\\w{3}_\\d{2}")[c(1:2)], format = "%b_%d_%Y")), fig.keep='all', fig.width=5, out.width='.90\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 1, fig.show="hold"} -->
+
+<!-- walk2(.x = all_data %>% select(Jan_23_2017:Jan_26_2017), -->
+<!--       .y = strptime(str_subset(colnames(all_data), "^\\w{3}_\\d{2}")[c(1:2)], format = "%b_%d_%Y"), -->
+<!--       .f = ~print(ggplot(aes(x = .x), data = all_data) + -->
+<!--         geom_bar(position = "dodge", stat = "count") + -->
+<!--         xlab(as.character(.y)) + -->
+<!--         theme(axis.text.x = element_text(angle = 75, size = 9, vjust = 0.6)))) -->
+
+<!-- ``` -->
+
+
+<!-- ```{r cor-graph-barplot-viz2, fig.cap = "Growth progress of genotypes at different dates (...continued)", fig.subcap=paste("Growth stage at", strptime(str_subset(colnames(all_data), "^\\w{3}_\\d{2}")[c(3:4)], format = "%b_%d_%Y")), fig.keep='all', fig.width=5, out.width='.90\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 1, fig.show="hold"} -->
+
+<!-- walk2(.x = all_data %>% select(Jan_29_2017:Feb_02_2017), -->
+<!--       .y = strptime(str_subset(colnames(all_data), "^\\w{3}_\\d{2}")[c(3:4)], format = "%b_%d_%Y"), -->
+<!--       .f = ~print(ggplot(aes(x = .x), data = all_data) + -->
+<!--         geom_bar(position = "dodge", stat = "count") + -->
+<!--         xlab(as.character(.y)) + -->
+<!--         theme(axis.text.x = element_text(angle = 75, size = 9, vjust = 0.6)))) -->
+
+<!-- ``` -->
+
+
+<!-- ```{r cor-graph-barplot-viz3, fig.cap = "Growth progress of genotypes at different dates (...continued)", fig.subcap=paste("Growth stage at", strptime(str_subset(colnames(all_data), "^\\w{3}_\\d{2}")[c(5:6)], format = "%b_%d_%Y")), fig.keep='all', fig.width=5, out.width='.90\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 1, fig.show="hold"} -->
+
+<!-- walk2(.x = all_data %>% select(Feb_06_2017:Feb_23_2017), -->
+<!--       .y = strptime(str_subset(colnames(all_data), "^\\w{3}_\\d{2}")[c(5:6)], format = "%b_%d_%Y"), -->
+<!--       .f = ~print(ggplot(aes(x = .x), data = all_data) + -->
+<!--         geom_bar(position = "dodge", stat = "count") + -->
+<!--         xlab(as.character(.y)) + -->
+<!--         theme(axis.text.x = element_text(angle = 75, size = 9, vjust = 0.6)))) -->
+<!-- ``` -->
+
+<!-- ```{r cor-graph-frequency-checks, results='asis'} -->
+<!-- uscore_replacer <- function(x)stringr::str_replace_all(x, "_", " ") -->
+<!-- walk(.x = c("Jan_23_2017",  -->
+<!--             # "Jan_26_2017",  -->
+<!--             "Jan_29_2017",  -->
+<!--             # "Feb_02_2017",  -->
+<!--             "Feb_06_2017",  -->
+<!--             "Feb_23_2017"), -->
+<!--      .f = ~ all_data %>%  -->
+<!--        select(lin_check, .x) %>%  -->
+<!--        filter(lin_check %in% c("1", "2", "3", "4")) %>% -->
+<!--        droplevels.data.frame() %>% -->
+<!--        table() %>%  -->
+<!--        as.tibble() %>%  -->
+<!--        group_by(lin_check) %>%  -->
+<!--        slice(which.max(n)) %>%  -->
+<!--        ungroup() %>% # must ungroup for replacer to work -->
+<!--        rename_all(uscore_replacer) %>%  -->
+<!--        knitr::kable(format = "latex", booktabs = TRUE, caption = paste("Frequency of check varieties of different stages at", uscore_replacer(.x)), longtable = TRUE) %>%  -->
+<!--        kableExtra::kable_styling(latex_options = c("repeat_header"))%>% print()) -->
+<!-- ``` -->
+
+<!-- In general, based on the appearance of half number of spikes, the following holds true. -->
+
+<!-- - Aditya mean DAH = 70 -->
+<!-- - Bhrikuti mean DAH = 66 -->
+<!-- - Gautam mean DAH = 68 -->
+<!-- - Tilottama mean DAH = 65 -->
+
+## Correlation between numeric variables
+
+```{r corstars-function}
+
+# This function annotates the correlation coefficients 
+# with the stars corresponding to the level of significance
+# x is a matrix containing the data
+# method : correlation method. "pearson"" or "spearman"" is supported
+# removeTriangle : remove upper or lower triangle
+# results : "html" or "latex" (default)
+# align: a vector of alignment values as is specified in xtable(x, align)
+
+large <- function(x){
+paste0('{\\footnotesize{\\bfseries ', x, '}}')
+}
+
+corstars <-function(x, align, caption, method=c("pearson", "spearman"), removeTriangle=c("upper", "lower"),
+                     result=c("none", "html", "latex")){
+    #Compute correlation matrix
+    require(Hmisc)
+    x <- as.matrix(x)
+    correlation_matrix<-rcorr(x, type=method[1])
+    R <- correlation_matrix$r # Matrix of correlation coeficients
+    p <- correlation_matrix$P # Matrix of p-value 
+    
+    ## Define notions for significance levels; spacing is important.
+    mystars <- ifelse(p < .0001, "****", ifelse(p < .001, "** ", ifelse(p < .01, "**  ", ifelse(p < .05, "*   ", "    "))))
+    
+    ## trunctuate the correlation matrix to two decimal
+    R <- format(round(cbind(rep(-1.11, ncol(x)), R), 2))[,-1]
+    
+    ## build a new matrix that includes the correlations with their apropriate stars
+    Rnew <- matrix(paste(R, mystars, sep=""), ncol=ncol(x))
+    diag(Rnew) <- paste(diag(R), " ", sep="")
+    rownames(Rnew) <- colnames(x)
+    colnames(Rnew) <- paste(colnames(x), "", sep="")
+    
+    ## remove upper triangle of correlation matrix
+    if(removeTriangle[1]=="upper"){
+      Rnew <- as.matrix(Rnew)
+      Rnew[upper.tri(Rnew, diag = TRUE)] <- ""
+      Rnew <- as.data.frame(Rnew)
+    }
+    
+    ## remove lower triangle of correlation matrix
+    else if(removeTriangle[1]=="lower"){
+      Rnew <- as.matrix(Rnew)
+      Rnew[lower.tri(Rnew, diag = TRUE)] <- ""
+      Rnew <- as.data.frame(Rnew)
+    }
+    
+    ## remove last column and return the correlation matrix
+    Rnew <- cbind(Rnew[1:length(Rnew)-1])
+    if (result[1]=="none") return(Rnew)
+    else{
+      if(result[1]=="html") print(xtable(Rnew), type="html", comment = FALSE)
+      else print(xtable(Rnew, auto = TRUE,  align = align, caption = caption), type="latex", 
+                 comment = FALSE, size = "\\footnotesize", 
+                 sanitize.colnames.function = large, 
+                 booktabs = TRUE, tabular.environment="longtable", 
+                 floating=FALSE)
+    }
+} 
+```
+
+
+\blandscape
+
+```{r plot-starred-corr, results='asis'}
+
+cortable <- corstars(all_data %>% 
+                       select_if(is.numeric) %>% 
+                       rename("Disease 75" = dis_march15, "SPADI" = chl_ind1_2, "SPADII" = chl_ind2_2) %>% 
+                       rename_all(function(x)stringr::str_replace_all(x, c("_" = " ", "7(?!\\d)" = "")) %>% str_to_title()) %>% 
+                       rename_all(function(x)stringr::str_trunc(x, width = 4, side = c("c"), ellipsis = "")))
+
+# # better render a kable as shown below
+# print(xtable(cortable[,1:9], auto = TRUE,  
+#              align=c("C{0.15\\textwidth}|", rep("C{0.12\\textwidth}", times = 9)), 
+#              caption = "Correlation\\label{tab:cornew1} coefficients of numeric response variables observed in study"), 
+#       type="latex", 
+#       comment = FALSE, size = "\\small", 
+#       sanitize.colnames.function = large, 
+#       booktabs = TRUE, tabular.environment="longtable", 
+#       floating=FALSE, caption.placement = "top")
+# 
+# cat("\\addtocounter{table}{-1}")
+# 
+# 
+# print(xtable(cortable[,-c(1:9)], auto = TRUE,  
+#              align=c("C{0.15\\textwidth}|", rep("C{0.12\\textwidth}", times = 8)), 
+#              caption = "Correlation\\label{tab:cornew1} coefficients of numeric response variables observed in study (...continued)"), 
+#       type="latex", 
+#       comment = FALSE, size = "\\small", 
+#       sanitize.colnames.function = large, label = "tab:correl-tab",
+#       booktabs = TRUE, tabular.environment="longtable", 
+#       floating=FALSE, caption.placement = "top")
+
+corknit <- cortable %>% 
+  knitr::kable(format = "latex", caption = "Correlation coefficients of numeric response variables observed in study", booktabs = TRUE) %>% 
+  kableExtra::kable_styling(font_size = 12, latex_options = c("scale_down")) %>% 
+  kableExtra::column_spec(1:9, width = "0.12\\\\textwidth") %>% 
+  kableExtra::row_spec(0, bold = TRUE) %>% 
+  kableExtra::column_spec(0, bold = TRUE) %>% 
+  kableExtra::footnote(general = "p < .0001: **** ; p < .001: *** ; p < .01: ** ; p < .05: * 
+                       \\\\newline Yild: Yield, Paen: Panicle length, 
+                       \\\\newline ThWt: Thousand kernel weight, Gran: Number of grains per panicle,
+                       \\\\newline Efer: Number of effective tillers, Di75: Disease score at Z75, 
+                       \\\\newline Gr65: Greenness score at Z65, Gr75: Greenness score at Z75, 
+                       \\\\newline Gr85: Greenness score at Z85, La75: LAUG score at Z75, 
+                       \\\\newline La85: LAUG score at Z85, Plht: Plant height, 
+                       \\\\newline Laar: Leaf area, Cttd: Canopy temperature depression, 
+                       \\\\newline Spdi: SPAD score at Z65, Spii: SPAD score at Z85, 
+                       \\\\newline Daad: Days to heading", 
+                       threeparttable = TRUE, escape = FALSE)
+corknit
+```
+
+\elandscape
+
+Pairwise test of pearson's correlation coefficients suggest a significant positive association of LAUG value during Zadok's stage 65 and 75 and the yield. Besides that, relative leaf chlorophyll content of the leaves (SPAD) recorded at Zadok's stage 65 are also significantly positively correlated with the yield. To the contrary, LAUG during Zadok's stage 65 was, with high degree of significant positive correlation, associated with the yield. This potentially implies that, a sharp drop in leaf greenness values right after flowering might be beneficial for yield formation, particularly to the number of grains per panicles.
+
+No direct correlation to yield was apparent for other leaf health and traits characterizing canopy architecture. Major yield component traits associated with the yield were (in the decreasing order of significance) Number of effective tillers, Number of grains per panicle and the Thousand kernel weight. In addition, a higher relative chlorophyll content and a larger leaf surface area are implicated in longer panicles, although panicle length on itself is not significantly associated with the yield of the crop.
+
+Several leaf health and canopy related traits had significant correlation with each other, for example, number of heading and flowering days for genotypes showed negative correlation with the decline in leaf greenness values, at both the early and latter stages of the life cycle. This potentially implies that, genotypes which flower early show higher drop in chlorophyll contents and reach to senescence earlier.
+
+Likewise, certain phenological traits of interest in most selection programmes like days to heading and days to anthesis were significantly positively correlated with a particular yield component trait -- thousand kernel weight, and the latter is even negatively correlated to the number of grains per panicle.
+
+<!-- Figure \@ref(fig:pairplot-yield-n-comp-traits) shows numeric correlation summary (upper triangle of matrix) and scatterplot with density overlay (lower triangle of matrix) of yield and yield component traits. -->
+
+<!-- ```{r pairplot-yield-n-comp-traits, echo=FALSE, warning=FALSE, fig.cap="Pairplot of bivariate summary of yield and yield component traits", fig.width=7, out.width='.80\\linewidth'} -->
+<!-- GGally::ggpairs(all_data %>%  -->
+<!--                   select_at(vars(stringr::str_subset(colnames(.),  -->
+<!--                                                      # selects only yield and yield comp traits with "7" on names -->
+<!--                                                      pattern = "(?<![:digit:])7(?![:digit:])"))) %>%  -->
+<!--                   rename_all(function(x)stringr::str_replace_all(x, c("_" = " ", "7" = "")) %>% str_to_title())) -->
+
+<!-- ``` -->
+
+<!-- Figure \@ref(fig:pairplot-health-traits) shows numeric correlation summary (upper triangle of matrix) and scatterplot with density overlay (lower triangle of matrix) of leaf health traits. -->
+
+<!-- ```{r pairplot-health-traits, echo=FALSE, warning=FALSE, fig.cap="Pairplot of bivariate summary of leaf health traits", fig.width=7, out.width='.80\\linewidth'} -->
+<!-- GGally::ggpairs(all_data %>%  -->
+<!--                   select_at(vars(`Disease 75` = dis_march15, stringr::str_subset(colnames(.), pattern = "greenness"),  -->
+<!--                                  stringr::str_subset(colnames(.), pattern = "LAUG"))) %>%  -->
+<!--                   rename_all(function(x)stringr::str_replace_all(x, c("_" = " ")) %>% str_to_title())) -->
+<!-- ``` -->
+
+<!-- Figure \@ref(fig:pairplot-plmorphenarch-traits) shows numeric correlation summary (upper triangle of matrix) and scatterplot with density overlay (lower triangle of matrix) of plant morphological, phenological and architectural  traits. -->
+
+<!-- ```{r pairplot-plmorphenarch-traits, echo=FALSE, warning=FALSE, fig.cap="Pairplot of bivariate summary of plant morphological, phenological and architectural  traits", fig.width=7, out.width='.80\\linewidth'} -->
+<!-- GGally::ggpairs(all_data %>%  -->
+<!--                   select_at(vars("plht", "lar", `SPADI`="chl_ind1_2", `SPADII`="chl_ind2_2",  -->
+<!--                                  ctd, days_to_head, days_to_anth)) %>%  -->
+<!--                   rename_all(function(x)stringr::str_replace_all(x, c("_" = " ")))) -->
+<!-- ``` -->
+
+<!-- ### Observed yield profile -->
+
+<!-- A bar plot showing observed mean yields of all treatment genotypes is presented in Figure \@ref(fig:yield-bar). -->
+
+<!-- ```{r yield-bar, echo=FALSE, fig.cap="Observed mean yield of genotypes", fig.width=7, out.width='.90\\linewidth', fig.asp = 0.55} -->
+
+<!-- mean_yields <- aggregate(yield7 ~ lin_check,  -->
+<!--                          function(x)mean(x, na.rm = TRUE),  -->
+<!--                          data = all_data) -->
+<!-- mean_yields <- mean_yields %>%  -->
+<!--   rename(yield = yield7) -->
+
+<!-- ## function for binaray color palette generation. -->
+<!-- numColors <- 2 # How many colors you need -->
+
+<!-- # Create a function that takes a number and returns a -->
+<!-- # qualitative palette of that length (from the scales package) -->
+<!-- getColors <- scales::brewer_pal('qual') -->
+<!-- twoColors <- getColors(numColors) -->
+
+<!-- ab_mean <- function(x) { # binary color palette generator, x is a vector -->
+<!--   mypalette <- character() -->
+<!--   mypalette <- ifelse(mean(x) > x,  -->
+<!--                       c(mypalette, twoColors[1]), c(mypalette, twoColors[2])) -->
+<!--   return(mypalette) -->
+<!-- } -->
+
+<!-- mypalette <- ab_mean(mean_yields$yield) -->
+<!-- names(mypalette) <- levels(droplevels.factor(mean_yields$lin_check)) -->
+
+<!-- # # plotting the bar chart -->
+<!-- # ggplot(data = mean_yields, mapping = aes(lin_check, yield)) + -->
+<!-- #   geom_bar(stat = "identity") + -->
+<!-- #   xlab("Genotypes") + -->
+<!-- #   ylab("Mean yield") + -->
+<!-- #   theme(axis.text.x = element_text(angle = 60, size = 10, vjust = 0.7, -->
+<!-- #                                    colour=mypalette)) + -->
+<!-- #   geom_hline(aes(yintercept = mean(mean_yields$yield)),  -->
+<!-- #              size = 0.8, color = "red", -->
+<!-- #              linetype = "dashed") -->
+<!-- # # same as plotting below -->
+
+<!-- ggplot(mean_yields, aes(x = lin_check)) + -->
+<!--   stat_summary_bin(aes(y = yield), fun.y = "mean", geom = "bar") + -->
+<!--   theme(axis.text.x = element_text(angle = 60, size = 9, vjust = 0.7, color = mypalette),  -->
+<!--         plot.title = element_text(hjust = 0.5, size = 14)) + -->
+<!--   labs(title = "Comparison of mean yield of genotypes", -->
+<!--        x = "Genotypes",  -->
+<!--        y = "Mean yield") + -->
+<!--   geom_hline(aes(yintercept = mean(mean_yields$yield)),  -->
+<!--              size = 0.8, color = "red",   -->
+<!--              linetype = "dashed") -->
+
+<!-- # tidy-up workspace -->
+<!-- rm(getColors, numColors, twoColors, ab_mean, mypalette) -->
+<!-- ``` -->
+
+<!-- A bar plot fitted values of yield of all treatment genotypes is presented in Figure \@ref(fig:yield-blup-bar). -->
+
+<!-- ```{r yield-blup-bar, echo=FALSE, fig.cap="Fitted values of genotypic means of yield"} -->
+
+<!-- yields_fitted <- suppressMessages(lme4::lmer(yield7 ~  -->
+<!--                                    rowgroup +  -->
+<!--                                    colgroup + -->
+<!--                                    rowgroup/row +  -->
+<!--                                    colgroup/col +  -->
+<!--                                    interaction(rowgroup, colgroup) + -->
+<!--                                    (1 | lin_check), -->
+<!--                                  data = all_data) %>%  -->
+<!--   broom::augment() %>%  -->
+<!--   select(lin_check, yield_fitted = .fitted)) -->
+
+<!-- mean_yields_fitted <- yields_fitted %>%  -->
+<!--   group_by(lin_check) %>%  -->
+<!--   summarise(yield_fitted = mean(yield_fitted)) %>%  -->
+<!--   ungroup() -->
+
+<!-- ## function for binaray color palette generation. -->
+<!-- numColors <- 2 # How many colors you need -->
+
+<!-- # Create a function that takes a number and returns a -->
+<!-- # qualitative palette of that length (from the scales package) -->
+<!-- getColors <- scales::brewer_pal('qual') -->
+<!-- twoColors <- getColors(numColors) -->
+
+<!-- ab_mean <- function(x) { # binary color palette generator, x is a vector -->
+<!--   mypalette <- character() -->
+<!--   mypalette <- ifelse(mean(x) > x,  -->
+<!--                       c(mypalette, twoColors[1]), c(mypalette, twoColors[2])) -->
+<!--   return(mypalette) -->
+<!-- } -->
+
+<!-- mypalette <- ab_mean(mean_yields_fitted$yield_fitted) -->
+<!-- names(mypalette) <- levels(droplevels.factor(mean_yields_fitted$lin_check)) -->
+
+<!-- # # plotting the bar chart -->
+<!-- # ggplot(data = mean_yields_blup, mapping = aes(lin_check, yield_blup)) + -->
+<!-- #   geom_bar(stat = "identity") + -->
+<!-- #   xlab("Genotypes") + -->
+<!-- #   ylab("BLUP") + -->
+<!-- #   theme(axis.text.x = element_text(angle = 60, size = 10, vjust = 0.7, -->
+<!-- #                                    colour=mypalette)) + -->
+<!-- #   geom_hline(aes(yintercept = mean(mean_yields$yield_blup)),  -->
+<!-- #              size = 0.8, color = "red", -->
+<!-- #              linetype = "dashed") -->
+<!-- # # same as plotting below -->
+
+<!-- ggplot(mean_yields_fitted, aes(x = lin_check)) + -->
+<!--   stat_summary_bin(aes(y = yield_fitted), fun.y = "mean", geom = "bar") + -->
+<!--   theme(axis.text.x = element_text(angle = 60, size = 8, vjust = 0.7, color = mypalette),  -->
+<!--         plot.title = element_text(hjust = 0.5, size = 14)) + -->
+<!--   labs(x = "Genotypes",  -->
+<!--        y = "Fitted values of yield") + -->
+<!--   geom_hline(aes(yintercept = mean(mean_yields_fitted$yield_fitted)),  -->
+<!--              size = 0.8, color = "red",   -->
+<!--              linetype = "dashed") -->
+
+<!-- # tidy-up workspace -->
+<!-- rm(getColors, numColors, twoColors, ab_mean, mypalette) -->
+<!-- ``` -->
+
+## Principal component analysis
+
+```{r multivariate-data, echo=FALSE}
+# unaggregated
+plant_resp_multivar <- all_data %>%
+  select(row, col, 
+         rowgroup, colgroup, 
+         Genotype, lin_check, 
+         check_or_line,
+         yield = yield7, panicle_len = panicle_len7, 
+         grain_per_pan = grain_per_pan7, thou_grain_wt = thou_grain_wt7, 
+         effective_tiller = effective_tiller7, greenness_z65,
+         greenness_z75, greenness_z85, LAUG_65_75, LAUG_75_85, 
+         "Disease_75" = dis_march15,
+         "SPADI" = chl_ind1_2, "SPADII" = chl_ind2_2, ctd,
+         plht, lar, 
+         days_to_head, days_to_anth)
+
+# scaled
+plant_resp_multivar <- plant_resp_multivar %>% 
+  select(lin_check, check_or_line, which(purrr::map(., class)=="numeric"), days_to_head, days_to_anth) %>% 
+  filter(complete.cases(.)) %>%
+  mutate_if(is.numeric, scale) %>% 
+  droplevels.data.frame()
+
+```
+
+
+```{r principal-component-viz, echo=FALSE, fig.cap="PCA biplot showing first two principal components"}
+
+# PCA biplots
+# # pca biplot (default plot function)
+# (princomp(plant_resp_multivar %>%
+#             select_if(is.numeric) %>% scale(), cor = TRUE)) %>% 
+#   biplot()
+
+# pca biplot (ggplot2::autoplot function obtained from ggfortify package)
+suppressPackageStartupMessages(require(ggfortify))
+ggplot2::autoplot(princomp(plant_resp_multivar %>% 
+                             select_if(is.numeric), cor = TRUE), 
+                  frame = FALSE,  data = plant_resp_multivar, 
+                  # frame.type = 'norm', # plots ellipse
+                  loadings = TRUE, loadings.label = TRUE,
+                  loadings.colour = 'blue', # notice spelling of colour
+                  loadings.label.size = 4) +
+  theme_bw()
+
+# # pca biplot (custom created ggplot2 function)
+# PCbiplot <- function(PC, x="PC1", y="PC2") {
+#   # PC being a prcomp object
+#   data <- data.frame(PC$x)
+#   plot <- ggplot(data, aes(x=get(x), y=get(y))) + 
+#     geom_point() + 
+#     xlab("PC1") +
+#     ylab("PC2")
+#   plot <- plot + geom_hline(yintercept = 0, size=.2) + geom_vline(xintercept = 0, size=.2)
+#   datapc <- data.frame(varnames=rownames(PC$rotation), PC$rotation)
+#   mult <- min(
+#     (max(data[,y]) - min(data[,y])/(max(datapc[,y])-min(datapc[,y]))),
+#     (max(data[,x]) - min(data[,x])/(max(datapc[,x])-min(datapc[,x])))
+#   )
+#   datapc <- transform(datapc,
+#                       v1 = .7 * mult * (get(x)),
+#                       v2 = .7 * mult * (get(y))
+#   )
+#   plot <- plot + coord_equal() + 
+#     geom_text(data=datapc, aes(x=v1, y=v2, label=varnames), size = 5, vjust=1, color="red")
+#   plot <- plot + 
+#     geom_segment(data=datapc, aes(x=0, y=0, xend=v1, yend=v2), 
+#                  arrow=arrow(length=unit(0.2,"cm")), alpha=0.75, color="red")
+#   plot
+# }
+# 
+# pc_obj <- prcomp(plant_resp_multivar %>% 
+#          select_if(is.numeric), scale=T)
+# PCbiplot(pc_obj)
+
+# # pam: partitioning around medoids
+# suppressPackageStartupMessages(require(ggfortify))
+# ggplot2::autoplot(cluster::pam(plant_resp_multivar %>% select_if(is.numeric), k = 3), 
+#                   frame = TRUE, 
+#                   frame.type = 'norm', # plots ellipse
+#                   loadings = TRUE, loadings.label = TRUE, 
+#                   loadings.label.size = 3)
+```
+
+
+The principal component analysis of continuous multivariate response shows that first two principal components explain `r 23.55 + 11.62`% variation. This is depicted in the Figure \@ref(fig:principal-component-viz). Table \@ref(tab:principal-component-summary) shows summary of principal component analysis (Top ten principal components are shown with corresponding measures of proportionate variance and standard deviation of principal axes).
+
+For the first principal component axis (PC1), most variables have positive values (All except plant height, canopy temperature depression, disease score and the number of effective tillers triats). Thus, most variables are positively correlated between each other. Most leaf health related and phenological traits, including greenness scores of two latter stages, LAUG values and the days to heading and anthesis traits, constrain the PC1 eigenvector (based on a large magnitude of variable eigenvalue loadings) (Table \@ref(tab:principal-component-loadings)). Interestingly, the variability accounted for by this PC axis is different from that of the PC2 and PC3 (latter captures 10.3% variation). Traits related to yield have higher factor variable loadings in PC3, amongst which yield _per se_ has the highest, while the number of effective tillers and the number of grains per panicle also contrain the third eigenvector. The scoring for disease contrasts itself in PC2. Also, all yield related traits can be seen as being positively correlated in the PC3 axis. Similarly, the indication of negative correlation between the days to heading and anthesis and the leaf greenness related traits corroborates the earlier speculation that genotypes that flower early are also characterized by earlier signs of drop in chlorophyll contents, and therefore reach to the senescence earlier.
+
+```{r principal-component-summary, results="asis"}
+
+# (princomp(plant_resp_multivar %>%
+#            select_if(is.numeric) %>% scale(), cor = TRUE))
+
+# # directly providing scaled covariance matrix gives the same result
+# (princomp(covmat = plant_resp_multivar %>%
+#            select_if(is.numeric) %>% scale() %>%
+#            cov()))$sd
+
+# using prcomp function with scale=TRUE gives the same result
+(summary(prcomp(plant_resp_multivar %>%
+                  select_if(is.numeric), scale = T)))$importance %>% 
+  as.data.frame() %>% 
+  select(1:10) %>% 
+  knitr::kable(format = "latex",
+               caption = "Summary of principal component analysis with measures of variation explained by top ten principal axes",
+               booktabs = T,
+               linesep = "",
+               align = "c", digits = 2) %>%
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position"),
+                            full_width = FALSE, font_size = 11) %>%
+  kableExtra::row_spec(row = 0, bold = TRUE) %>% 
+  kableExtra::column_spec(column = 0, bold = TRUE)
+
+# # Thus,
+# (princomp(plant_resp_multivar %>%
+#             select_if(is.numeric), cor = TRUE))$sd
+# # and,
+# (princomp(plant_resp_multivar %>%
+#             select_if(is.numeric) %>% scale()))$sd
+# # will differ by the factor $\sqrt{(N-1)/N}$.
+```
+
+
+```{r principal-component-loadings, results='asis'}
+# # Eigenvalues/principal component factor loadings
+(prcomp(plant_resp_multivar %>%
+          select_if(is.numeric) %>%
+          scale()))$rotation %>% 
+  as.data.frame() %>% 
+  select(PC1:PC3) %>% 
+  rownames_to_column(var = "Variable") %>% 
+  mutate(Variable = stringr::str_replace_all(Variable, c("_" = " ", "7(?!\\d)" = "")) %>% 
+               str_to_title()) %>% 
+  knitr::kable(format = "latex",
+               caption = "PCA factor loadings of top three principal components on variables for each of the numeric response variables observed in study",
+               booktabs = T,
+               linesep = "",
+               align = "c", digits = 3) %>%
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position"),
+                            full_width = FALSE, font_size = 11) %>%
+  kableExtra::row_spec(row = 0, bold = TRUE) %>% 
+  kableExtra::column_spec(column = 0, bold = TRUE)
+
+# # provides easy functionality of viewing and plotting factor map (individuals/variables) of PCA
+# FactoMineR::PCA(plant_resp_multivar %>%
+#                   select_if(is.numeric), scale.unit = TRUE, graph = TRUE)
+```
+
+
+```{r screeplot, echo=FALSE, fig.cap="Principal component analysis screeplot of plants' trait responses", fig.width=7, out.width="0.80\\linewidth", fig.asp = 0.5}
+# screeplot visualization (to find appropriate number of clusters)
+# prcomp uses correlation for obtaining eigenvectors by default
+prcomp(plant_resp_multivar %>% 
+         select_if(is.numeric) %>% 
+         scale()) %>% 
+  screeplot(type = "lines", main = "")
+
+distance_mat <- suppressWarnings(plant_resp_multivar %>% 
+                                   group_by(lin_check, check_or_line) %>%
+                                   summarise_if(is.numeric, function(x)mean(x, na.rm = TRUE)) %>%
+                                   ungroup() %>%
+                                   column_to_rownames(var = "lin_check") %>% 
+                                   select_if(is.numeric) %>% 
+                                   scale() %>% 
+                                   dist())
+```
+
+
+The PCA screeplot (Figure \@ref(fig:screeplot)) shows the decay of variability (y-axis) with increasing numbers of independent principal components (x-axis) used for decomposing observed variability in the data. A sharp drop in proportion of total variance explained by the PCs is only realized after linear combination of 6-7 PCs. This indicates that data inherently is best resolved into large number of dimensions. This seems to be true and features unique opportunity as well as challenge from the perspective of modeling and analysing of a field experiment while controlling for several extrinsic factors that might otherwise result in the problem of sparsity of data.
+
+<!-- ## Cluster analysis -->
+
+<!-- ### Determination of optimum number of clusters through model based clustering {#cluster-number} -->
+
+<!-- Using parametrized Gaussian mixture models (GMM), the optimal model and number of clusters have been determined according to the Bayesian Information Criterion (BIC) for expectation-maximization. In the process, model search was performed and the models were ranked based on the BIC values. The linear function with highest information content was selected and the numbers of clusters determined by the resultant model [@luca2016].  -->
+
+<!-- ```{r model-search, echo=FALSE} -->
+<!-- suppressPackageStartupMessages(library(mclust)) -->
+
+<!-- # the function seeks for how many clusters -->
+<!-- # are optimal, set it to search for -->
+<!-- # at least 1 model and up 20. -->
+<!-- d_clust <- Mclust(as.matrix(plant_resp_multivar %>%  -->
+<!--                               group_by(lin_check, check_or_line) %>% -->
+<!--                               summarise_if(is.numeric,  -->
+<!--                                            function(x)mean(x, na.rm = TRUE)) %>% -->
+<!--                               ungroup() %>%  -->
+<!--                               select_if(is.numeric) %>%  -->
+<!--                               scale()), G=1:20) -->
+<!-- ``` -->
+
+```{r echo=FALSE, eval=FALSE, include=FALSE}
+# The model-based optimal number of clusters is determined to be `r d_clust$G`. This is also illustrated in Figure \@ref(fig:bic-cluster-determine), where model number `r d_clust$G` has, in average, highest optimal BIC values.
+
+```
+
+<!-- ```{r bic-cluster-determine, fig.cap="Model BIC values based number of cluster determination", echo=FALSE, out.width="80%", fig.asp=0.6} -->
+<!-- plot(d_clust$BIC) -->
+<!-- ``` -->
+
+
+<!-- ### Cluster dendrogram -->
+
+<!-- A cluster dendrogram using average linkage (Unweighted Pair Group Method with Arithmetic Mean; UPGMA) method for proximity calculation showing three discrete clusters (cluster number determined using GAM) is presented in Figure \@ref(fig:dendrogram-viz). The process of choosing precise number of clusters is described in detail in Section \@ref(cluster-number). -->
+
+<!-- ```{r dendrogram-viz, echo=FALSE, fig.height=8, fig.asp=1.6, out.height="100%", fig.cap="Dendrogram cluster summarising all observed numeric variables recorded in the study using average linkage method"} -->
+
+<!-- hierarchial_clusters <- hclust(distance_mat, "ave") -->
+
+<!-- # # choose 4 clusters -->
+<!-- # clust <- cutree(hierarchial_clusters, k=4) -->
+<!-- # clust.df <- data.frame(label=names(clust), cluster=factor(clust)) -->
+<!-- #  -->
+<!-- # # convert cluster object to use with ggplot -->
+<!-- # dend <- ggdendro::dendro_data(hierarchial_clusters, type="rectangle") -->
+<!-- #  -->
+<!-- # # dend[["labels"]] has the labels, merge with clust.df based on label column -->
+<!-- # dend[["labels"]] <- merge(dend[["labels"]],clust.df, by="label") -->
+<!-- #  -->
+<!-- # # note use of color=cluster in geom_text() -->
+<!-- # ggplot() +  -->
+<!-- #   geom_segment(data=ggdendro::segment(dend), aes(x=x, y=y, xend=xend, yend=yend)) +  -->
+<!-- #   geom_text(data=ggdendro::label(dend), aes(x=x, y=y, label=label, hjust=0, color=cluster), size=4) + -->
+<!-- #   coord_flip() + scale_y_reverse(expand=c(0.2, 0)) +  -->
+<!-- #   theme(axis.line.y=element_blank(), -->
+<!-- #         axis.ticks.y=element_blank(), -->
+<!-- #         axis.text.y=element_blank(), -->
+<!-- #         axis.title.y=element_blank(), -->
+<!-- #         panel.background=element_rect(fill="white"), -->
+<!-- #         panel.grid=element_blank()) -->
+
+<!-- # plot dendrogram -->
+<!-- k <- 3 -->
+<!-- dend <- hierarchial_clusters %>%  -->
+<!--   as.dendrogram %>% -->
+<!--   dendextend::set("nodes_pch", 19) %>% dendextend::set("nodes_cex", 1.2) %>%  -->
+<!--   dendextend::set("branches_k_color", k = k) %>% dendextend::set("branches_lwd", 0.7) %>% -->
+<!--   dendextend::set("labels_cex", 0.8) %>% dendextend::set("labels_colors", k = k) %>% -->
+<!--   dendextend::set("leaves_pch", 9) %>% dendextend::set("leaves_cex", 0.8) -->
+
+<!-- # plot(dend, horiz = TRUE) -->
+<!-- # dend %>% dendextend::rect.dendrogram(k=3, horiz = TRUE, -->
+<!-- #                            border = 8, lty = 5, lwd = 2) -->
+
+<!-- ggd1 <- dendextend::as.ggdend(dend) -->
+<!-- dendr <- ggdendro::dendro_data(hierarchial_clusters, type="rectangle") # convert for ggplot -->
+<!-- clust <- cutree(hierarchial_clusters,k=k)  # k clusters -->
+<!-- clust.df <- data.frame(label=ggdendro::label(dendr)$label, cluster=as.factor(clust)) -->
+<!-- dendr[["labels"]] <- merge(dendr[["labels"]],clust.df, by="label") -->
+<!-- templabel <- merge(ggdendro::label(ggd1),  -->
+<!--                    enframe(clust, value = "cluster"),  -->
+<!--                    by.x = "label", by.y = "name") %>%  -->
+<!--   select(-cex, col) -->
+<!-- rect <- aggregate(x~cluster,templabel,range) -->
+<!-- rect <- data.frame(rect$cluster,rect$x) -->
+<!-- ymax <- mean(hierarchial_clusters$height[length(hierarchial_clusters$height)-((k-2):(k-1))]) -->
+<!-- threenumsum <- function(x){c(min(x), (min(x)+max(x))/2, max(x))} -->
+
+<!-- ggplot() + -->
+<!--   geom_segment(data = ggd1$segments, aes(x=x, y=y, xend=xend, yend=yend)) + -->
+<!--   geom_text(data = ggdendro::label(ggd1), aes(x=x, y=y, label=paste(" ", label, sep = ""),  -->
+<!--                                               colour = as_factor(col), hjust=0), size=4) + -->
+<!--   coord_flip() + -->
+<!--   scale_y_reverse(expand=c(0.2, 0), -->
+<!--                   breaks = threenumsum(ggd1$segments$yend), -->
+<!--                   label = c("0%", "50%", "100%")) + -->
+<!--   geom_rect(data=rect, aes(xmin=X1-.3, xmax=X2+.3, ymin=0, ymax=ymax),  -->
+<!--             color="red", fill=1:k, linetype = 2, alpha = 0.2)+ -->
+<!--   scale_color_manual(labels = c("Cluster 1", "Cluster 2", "Cluster 3"), values = seq_along(1:k)+7) + -->
+<!--   labs(color = "Cluster index\n") + -->
+<!--   # ggdendro::theme_dendro() + -->
+<!--   theme_classic() + -->
+<!--   ylab("Similarity") + -->
+<!--   theme(axis.text.y = element_blank(), -->
+<!--         axis.ticks.y = element_blank(), -->
+<!--         axis.title.y = element_blank(), -->
+<!--         text = element_text(size = 14)) -->
+
+<!-- ``` -->

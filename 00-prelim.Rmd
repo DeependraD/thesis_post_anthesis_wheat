@@ -1,0 +1,17 @@
+# Preliminary Content {-}
+
+## Acknowledgements {-}
+
+I want to thank a few people.
+
+## Preface {-}
+
+Breeding for a trait, as transcribed within the framework of current and most recent technological advancements, requires that crosses be made and the resulting offsprings be tested. However simple or complex a procedure screening for trait of interest might embody, discriminatory tests are a prerequisite. Discrimination entails a suite of well designed experiment where the experimental materials are tested. Thenafter, the experimental outcomes are be interpreted based on the experimental accuracy and the set standards.
+
+In a investigation involving life forms, the difficulty as well as necessity to have control over non-experimental factors, considering the range of ensuing complexity, is tragic.
+
+## Dedication {-}
+
+You can have a dedication here if you wish. 
+
+`r if(!knitr:::is_latex_output()) '## Abstract {-}'`

@@ -1,0 +1,50 @@
+# Discussion {#discussion}
+
+## Relationship between leaf health and yield
+
+Four leaf health traits were identified with significant association to yield. Inspection of individual variance components reveals that for yield and yield component traits, blocking of plots into either factors, i.e row, column or superimposed row-colum, generally did not significantly reduce the error variance. However, thousand kernel weight was affected also by the variation along the column nested inside colum-group (increasing of effect along column 1 to 12). The finding is in accordance to the study of @neupane2016comparing, where significant estimates have been recovered by spatial modeling.
+
+Also, the effect on disease rating of foliar disease complex due to blocking in nested column inside columngroup is characterized by a decreasing gradient along column rank one to rank twelve. This might provide an explaination for significant difference in thousand grain weight also along the the column blocks. As expected, the yield associated trait benefitted by the reduced disease pressure along the column block. In a multi-year study undertaken to identify definitive traits and their relative importance in improving resistance to Helminthosporium blight along with yield related traits, @sharma2003selection reported similar negative correlation between resistance to foliar disease and the kernel weight.
+
+However, genotypes which manifested a sharp drop in relative chlorophyll content of the flag leaf just after antheis and before milking stage generally gave higher yields. The drop in chlorophyll content has often been ascribed to drought tolerance, in which case a higher drop in chlorophyll content is associated with drought sensitivity [@khakwani2013stomatal] (authors used chlorophyll fluorescence extinction measurement as) and irrigated cultivars in general showed higher decline in chlorophyll content, under stress.  In comparison, experimental condition of the field where genotypes were tested was irrigated prior to heading. Therefore, this might represent non-water-limiting/irrigated condition. This set of environmental conditions in combination with genotypic features that supress activated drought tolerance mechanism, might enable genotypes with higher LAUG values ($120.1$ and $92.18$, respectively for period between anthesis and medium milk and medium milk and soft dough stages) to better realize their potential yields. 
+
+Findings on the association of relative chlorophyll content and the decline in chlorophyll content with the yield in wheat extend that of @khakwani2013stomatal, where significant correlation between yield and the indicator of leaf chlorophyll have been reported. Current study highlights, in particular, the importance of leaf chlorophyll content and the rate of decline of greenness at early stages in reproductive phase of the crop [@wu2015chlorophyll]. For the leaf greenness trait at Z65, however leaving out the entry genotype "PRL/2\*PAS-TOR/4/CHOIX/STAR/3/HE1/3\*CNO79//...", which showed signs of severe depletion of green coloration of leaf early on life cycle, significant differences among entry genotypes could be inconclusive had the outlier been trimmed out.
+
+## Relationship between morphological and phenological traits and yield
+
+With apparent positive but mild correlation between the days to heading and days to anthesis and the thousand kernel weight, the results from current study contrasts with observations by @duveiller2005epidemiology, in which they report a negative association of days to maturity with the thousand kernel weight. Extending to their findings, authors clarify that differences in the trait association were not always significant for early sown wheat (planted between 26 Nov to 11 Dec). Inferring on grounds that current study had sowing date prior to that reported in the study (23 March), it is imperative that negative association do not hold. The study, however, fails to link the relationship between days to heading/anthesis and yield, which has been observed with negative but weak correlation in some studies [@mohammadi2012relationships].
+
+<!-- Correlation between yield and plant height -->
+
+<!-- ```{r} -->
+<!-- all_data %>% -->
+<!--   filter(!check_or_line == "line") %>% -->
+<!--   select(yield7, plht) %>% -->
+<!--   filter(complete.cases(.)) %>% -->
+<!--   # na.omit() %>% -->
+<!--   as.matrix() %>% -->
+<!--   Hmisc::rcorr(type = "pearson") %>% -->
+<!--   # magrittr::extract(3) %>% -->
+<!--   purrr::pluck(3) # 3:p-value, 1:coeff -->
+<!-- ``` -->
+
+## Relationship between morphological and phenological traits and leaf health
+
+Canopy architecture traits comprising plant height and flag leaf area had no significant correlation with any of the observed leaf health traits. To the contrast, canopy temperature depression showed weak negative correlation with the leaf greenness at Z75, suggesting that a larger drop in canopy temperature often occurs in genotypes with greenner leaves. Also, greenness of leaves and the relative chlorophyll content of leaves are both negatively associated with foliar disease specific symptoms. This phenomena along with correlated response to days to maturity has been explained as probable resistance mechanism to HLB in a study exploring selection index for HLB reistance in spring wheat [@duveiller2005epidemiology]. 
+
+Likewise, although negative correlation was found between days to heading and the foliar disease prevalence, it's significance of could not be validated. This is in contrast to the finding of @mahto1999management, who reported significant negative albeit weak correlation between the two variables.
+
+## Leaf health as determinant of yield
+
+<!-- ```{r echo=FALSE, eval=FALSE, include=FALSE} -->
+<!-- yld_vs_health1 %>% lme4::fixef() %>% -->
+<!--   magrittr::extract(-c(1:5)) -->
+<!-- ``` -->
+
+Decrease in error variance invariably adds to the heritability estimates and relative efficiency of a trait, thus maximizing chances of selecting true to the type genotypes [@bondalapati2015field]. Almost 52% reduction in the error variance was obtained by incorporating leaf health traits in the model. Similarly, leaf health traits can be ascribed to upto 39% variation in yield estimates. Among the traits of interest are the LAUG decline during Z65 and Z75, greenness scores at both Z75 and Z65 and the relative chlorophyll content at Z65. In a study by [@benbella1998efficacy] have also implied significant effect of greenness trait -- defined in context of late maturity stage as "Stay green" -- in yield determination and its association with foliar blight disease. However, significance of foliar blight complex disease in yield determination in experimental conditions of the present study was not evident. This is probably because environmental/spatial effects of disease were more relevant (as observed from significant columwise blocking) and the heterogeniety between blocks was much higher to directly ascribe yields levels. Also, comparing two distinct yield groups (one with high TKW and the other with low TKW) in a study of evaluating wheat genotypes, authors have reported no significant association of two yield groups and the disease response (AUDPC) under timely sown conditions [@sharma2008reduction].
+
+Application of mixed modeling procedures to field phenotyping in wide set of environmental conditions is justified in several previous studies [@qiao2000evaluation; @smith2001applications]. Spatial covariate modeling along with leaf health also had beneficial effect on yield approximation, although exact quantification of effect estimates would require more advanced probabilistic techniques such as Jackknife resampling and bootstrapping [@wu2010; @wu2013]. 
+
+With respect to estimated yield, all check cultivars were superior to Aditya variety and no distinction could be made between Bhrikuti, Gautam and Tilottama genotypes. While with genotypic BLUP estimates, ranking of genotypes places following three genotypes (on decending order) on top: L71 (TRCH/SRTU-//KACHU/3/-KINGBIRD #1), L67 (WHEAR/-SOKOLL/4/-PASTOR//MILAN/-KAUZ/3/B...) and L85 (MUNAL #1\*2/4/-HUW234+LR34/PRINIA-//PBW3...). Pedigree information of the entry genotypes at foremost ranks suggests that genotypes composed of "MUNAL" in their pedigree with higher order^[Order of crossing is denoted by a number sandwiched between two backslash ('/')] crossings or recurrent crossing, preferably as female parent has tendency for better yields. 
+
+<!-- Mutivariate analysis using clustering places genotypes into three distinct clusters, based on all numeric traits observed in the study. Based on the groupings, entry genotype L106 (PFAU/MILAN//TROST/3/MUNAL#1/4/PFAU/MILAN//...), clustering uniquely under Cluster 2, produced optimal yields and showed low incidence of foliar disease (disease score: 1.33) and consistently maintained green foliage ($8.35$ and $7.96$, respectively at former and latter stage of the reproductive phase).  -->

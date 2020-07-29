@@ -1,0 +1,50 @@
+
+# Introduction
+
+## Background
+
+The bread Wheat (*Triticum aestivum* L.), as a crop that ranks first globally in cereal protein value, and that provides for majority of staple carbohydrates in the developed world, is gaining attention in improvement of both quality and quantity. This is expected to meet the need, in a substantial portion, of feeding the burgeoning population and for achieving a state of food self-sufficiency in Nepal.
+
+Agricultural statistics published by the Ministry of Agriculture Development states that the country imported food items worth around 10 billion NPR in the year 2015/016 [@ads2072_report]. Despite appreciable amounts of committments from the government for agriculture, as evident from the recent trends in fiscal year allocation of budget for agriculture sector, a forerunner indicative of vision of ADS to achieve food self-sufficiency status is yet to be seen [@fiscal_budget201718].
+
+Wheat is one among a few major food crops grown worldwide. It is often times credited for having had a central role to the beginning of agriculture [@harlan1981ecological]. The Bread Wheat has one of the largest known genome size among cultivated crops. It is a hexaploid with a genome thought to be composed of two or more distinct species' genomes following a series of allopolyploidization events in the past. Bread wheat has been traced to be composed of *T. urartu*(A), the *Sitopsis* section of *Aegilops*(B), and *Aegilops tauschii*(D) genomes [@dvorak1998structure].
+
+The population structure of wheat can be classified into three distinct gene pools characterized by the ease at which hybridization events occur among them. The primary gene pool consists of common cultivated and landraces of hexaploid wheat, cultivated and landraces of tetraploid wheat, wild *T. diccoides* and diploid donors of the A and D genomes to durum and bread wheats. With exception of from few rare cross combinations requiring embryo rescue, most individual of this gene pool readily hybridize. The secondary gene pool is composed of the polyploid *Triticum* and *Aegilops* spp.. The hybrids produced within this gene pool show poor chromosome pairing. The tertiary gene pool is comprised of individuals whose genomes are non-homologous. Diploid and polyploid species occur in this pool.
+
+Based on kernel color, endosperm hardness, and other grain quality characterstics spring wheat is classified into three distinct classes: Hard red spring wheat, Soft white wheat, and Hard white spring wheat. The spring wheat commonly grown in terai region of Nepal is of Hard red type.
+
+Improving crop ideotype, an important avenue of plant breeding, has motivated extensive research into phenotype and genetics of wheat so that ever long trend of increasing yield can be maintained. Studies have reported that highest yielding so called "Super wheat" have robust semi-dwarf stems, broad leaves, large spikes with a greater number of grains per head, and higher grain weights [@swaminathan2007agriculture].
+
+Crop breeding programs frequently target yield component traits rather than the yield _per se_, with the hope to have positive effect on yield [@slafer2003genetic]. Several candidate traits set themselves upto inventory of potentially desirable for yield improvement, but only a few of them can actually be reliably used in planned improvement programmes. The problem with candidate traits usually is that underlying mode of trait influencing the yield is not well established, and even if the biological pathway is well established, problem may lie if the variation associated with the trait is not stably inhertited [@saadalla1994response]; even acclaimed traits such as number of spikes per plant are asserted as not being an effective selection criterion [@mcneal1978selection]. Thus, the experiments fail to produce expected results under differing field conditions [@okuyama2005plant]. Characterization of effects of leaf health in yield and component traits, however, require measurement of stably expressed traits developmental and morpho-physiological traits, which are but only largely affected by a few attributable environmental factors, such as temperature or soil moisture these traits [@joshi2007stay].
+
+Post-anthesis foliar health could be a proxy for determining final grain yield. It has a direct implication on grain filling behavior of a plant. Ideally, the contribution of pre-anthesis photosynthetic reserves to the final grain yield has been found to stall around 5% to 10% [@sharma1992duration]. A major fraction of total yield, therefore, is dependent upon the photosynthesis that occurs post-anthesis. On the other hand, The yield synthesis post-anthesis is mainly a derivative of leaf area duration, which in turn is a function of leaf area index at anthesis and leaf longevity [@bingham1969physiological]. Terminal leaves, particularly the flag leaf and the one directly below it, have significant contribution to genotypic variation in yield [@aslam1978photosynthesis] with respect to provisioning of assimilate to functionally active parts of plants including the storage organ(grain). This variation has been ascribed largely to the difference in the leaf longevity [@lupton1972further]. 
+
+Similarly, it is well known that various biotic agents, primarily diseases, sustain reduction in yield with pathways that relate to the effective photosynthetic surface area [@lopes2012stay]. In a study that tested diverse lines of wheat from Nepal, Bangladesh and Philippines for tolerance to Helminthosporium leaf blight(HLB) disease, various wheat lines differed significantly for days to heading and maturity, plant height, tiller number, grain yield, area under disease progress curve (AUDPC), and the highest disease score (HDS). There was also a weak negative correlation between yield and AUDPC (r = -0.20) and HDS (r = -0.40) [@sharma1994blight].
+
+An effective photosynthetic surface area, especially that of uppermost leaves, is probably one of the prime component contributing assimilate to the grain filling. Therefore, a range of conditions that have a measurable effect on leaf health may have implications in yield determination. Specifically, the stay green trait(indicative of leaf longevity and expressed as decline in photosynthetically active chlorophyllous surface), the foliar-disease resistance trait(expressed as levels of necrotic or chlorotic appearance), the leaf area index (LAI), the leaf waxyness and glaucousness, and other traits associated with the canopy structure that potentially predispose leaf to environmental factors, all of which prolong post-anthesis photosynthetic activity might be traits determining crop's field level yield.
+
+## Statement of problem
+
+Due to intrinsic nature of agricultural land and unattended sources of heterogenity, breeding materials are often tested under limited precision. Improved randomization based experimental designs with multidimensional blocking structure that accomodate large number of treatment entries in a study, could provide an efficient alternative to traditional block designs for the estimation of effects. 
+
+While contextualizing on early testing problem, new experimental design framework provides an opportunity for reliably discriminating the variation among genotypes of different genetic backgrounds. The recovered intra-block information, will be used to study traits that contribute to post-anthesis leaf health and finally to the grain yield. The study aims to make model comparison based inference on the suitability of selecting certain crop traits over others and uses multivariate techniques in making recommendation for certain genotypes. Finally, the best among the set of candidate mixed models will be presented for yield prediction with model characteristics.
+
+Accurate field level prediction of yields is essential for making informed decisions about genotypic performance and in order to increase effectiveness of phenotype based selection, especially during early stages of genotype testing. This invariably means a better preparedness and a potential addition of useful germplasm to the national inventory for fighting challange of hunger ellimination and for tackling global climate shift.
+
+## Objectives
+
+<!-- - To estimate spatial effects associated with yield and leaf health traits -->
+- To identify post-antheis leaf health traits that influence yield
+- To explore association among crop leaf health, yield component crop morphological and phenological traits
+- To formulate an yield prediction model based on leaf health features of a crop.
+- To identify potential genotypes with favorable variation for enhanced post-antheis leaf health
+
+<!-- - to detect small-scale heterogeneity for soil moisture status and assess its relationship with grain yield and spatial adjustments of soil moisture status for optimal field moisture condition. -->
+<!-- - to evaluate the impact of spatial models on genotype ranking and genotypic selection. -->
+
+<!-- ## Hypothesis -->
+
+<!-- - Field spatial patterns have significant effects in vegetative and reproductive traits. -->
+<!-- - Field spatial variation have have significant effects in vegetative and reproductive traits. -->
+<!-- - Genotypes with certain leaf characterstics give better yields than others. -->
+<!-- - Genotypic variation in yield and yield component traits can be explained by post-antheis leaf health. -->

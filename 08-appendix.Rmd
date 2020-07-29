@@ -1,0 +1,206 @@
+`r if(knitr:::is_latex_output()) '\\appendix'`
+
+`r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'` 
+
+<!--
+If you feel it necessary to include an appendix, it goes here.
+-->
+
+# I
+
+<!-- This first appendix includes all of the R chunks of code that were hidden throughout the document (using the `include = FALSE` chunk tag) to help with readibility and/or setup. -->
+
+<!-- **In the main Rmd file** -->
+
+<!-- ```{r ref.label='include_packages', results='hide', echo = TRUE} -->
+<!-- ``` -->
+
+```{r yield-comparison-test, echo = FALSE}
+
+# model_yield1 <- purrr::map(.x = paste(c("yield",
+#                                        "effective_tiller", "thou_grain_wt",
+#                                        "grain_per_pan", "panicle_len"), "7", sep = ""),
+#                           .f = ~ lme4::lmer(get(.x) ~
+#                                               (1 | rowgroup) +
+#                                               (1 | colgroup) +
+#                                               (1 | row:rowgroup) +
+#                                               (1 | col:colgroup) +
+#                                               (1 | interaction_rc) +
+#                                               (1 | line_or_check),
+#                                             data = all_data))
+# 
+# model_yield2 <- purrr::map(.x = paste(c("yield",
+#                                        "effective_tiller", "thou_grain_wt",
+#                                        "grain_per_pan", "panicle_len"), "7", sep = ""),
+#                           .f = ~ lme4::lmer(get(.x) ~
+#                                               (1 | rowgroup) +
+#                                               (1 | colgroup) +
+#                                               (1 | row:rowgroup) +
+#                                               (1 | col:colgroup) +
+#                                               (1 | interaction_rc),
+#                                             data = all_data))
+
+```
+
+
+```{r leaf-health-comparison-test, echo=FALSE}
+
+# model_leaf_health1 <- purrr::map(.x = c("dis_march15", "greenness_z65",
+#                                        "greenness_z75", "greenness_z85",
+#                                        "LAUG_65_75", "LAUG_75_85"),
+#                                 .f = ~ lme4::lmer(get(.x) ~
+#                                             (1 | rowgroup) +
+#                                             (1 | colgroup) +
+#                                             (1 | row:rowgroup) +
+#                                             (1 | col:colgroup) +
+#                                             (1 | interaction_rc) +
+#                                             (1 | line_or_check),
+#                                           data = all_data))
+# 
+# model_leaf_health2 <- purrr::map(.x = c("dis_march15", "greenness_z65",
+#                                        "greenness_z75", "greenness_z85",
+#                                        "LAUG_65_75", "LAUG_75_85"),
+#                                 .f = ~ lme4::lmer(get(.x) ~
+#                                             (1 | rowgroup) +
+#                                             (1 | colgroup) +
+#                                             (1 | row:rowgroup) +
+#                                             (1 | col:colgroup) +
+#                                             (1 | interaction_rc),
+#                                           data = all_data))
+
+```
+
+
+```{r other-comparison-test, echo=FALSE}
+
+# model_other_1 <- purrr::map(.x = c("plht", "lar",
+#                                        "chl_ind1_2", "chl_ind2_2", "ctd",
+#                                        "days_to_head", "days_to_anth"),
+#                           .f = ~ lme4::lmer(get(.x) ~
+#                             (1 | rowgroup) +
+#                             (1 | colgroup) +
+#                             (1 | row:rowgroup) +
+#                             (1 | col:colgroup) +
+#                             (1 | interaction_rc) +
+#                             (1 | line_or_check),
+#                           data = all_data))
+# 
+# model_other_2 <- purrr::map(.x = c("plht", "lar",
+#                                        "chl_ind1_2", "chl_ind2_2", "ctd",
+#                                        "days_to_head", "days_to_anth"),
+#                           .f = ~ lme4::lmer(get(.x) ~
+#                             (1 | rowgroup) +
+#                             (1 | colgroup) +
+#                             (1 | row:rowgroup) +
+#                             (1 | col:colgroup) +
+#                             (1 | interaction_rc),
+#                           data = all_data))
+```
+
+
+**Tables referenced in Chapter \@ref(modeling-yield-and-yield-component-traits):**
+
+```{r, echo=FALSE, results='asis', warning=FALSE, message=FALSE}
+# # save and load all previous chunk results
+# save(list = c("model_yield1", "model_yield2", 
+#               "model_leaf_health1", "model_leaf_health2", 
+#               "model_other_1", "model_other_2"), 
+#      file = "08-appendix.RData", 
+#      envir = .GlobalEnv)
+load("08-appendix.RData")
+
+yield_models_compare <- pmap(list(model_yield, model_yield1, model_yield2),
+                             .f = function(x, y, z) anova(x, y, z) %>%
+                               broom::tidy() %>%
+                               mutate(term = c("Blocking factors",
+                                               "Blocking factors + Entry genotypes",
+                                               "Blocking factors + Check and entry genotypes")))
+
+pwalk(.l = list(yield_models_compare, 
+               c("Yield", "Number of effective tillers", 
+                 "Thousand kernel weight", "Number of grains per panicle", 
+                 "Panicle length"), 
+               c("lrt-yield", "lrt-netill", "lrt-tkw",
+                 "lrt-gperpan", "lrt-panlen")),
+     .f = function(x, y, z){knitr::kable(x, format = "latex", 
+                                         booktabs = TRUE, align = "l", 
+                                         caption = paste("\\label{tab:", z, "}", 
+                                                         'ANOVA table with likelihood ratio test for ', y, sep = "")) %>% 
+         kableExtra::kable_styling(latex_options = "HOLD_position") %>%
+         kableExtra::column_spec(1, width = "3.5cm") %>% 
+         print()
+     })
+```
+
+
+**Tables referenced in Chapter \@ref(modeling-leaf-health-traits):**
+
+```{r echo=FALSE, results='asis', warning=FALSE, message=FALSE}
+
+leaf_health_models_compare <- pmap(list(model_leaf_health, model_leaf_health1, model_leaf_health2),
+                                   .f = function(x, y, z) anova(x, y, z) %>% 
+                                     broom::tidy() %>% 
+                                     mutate(term = c("Blocking factors", 
+                                                     "Blocking factors + Entry genotypes", 
+                                                     "Blocking factors + Check and entry genotypes"))) 
+
+pwalk(.l = list(leaf_health_models_compare, 
+               c("Disease score at Zadok's stage 75", 
+                 "Flag leaf greenness score at Zadok's stage 65", 
+                 "Flag leaf greenness score at Zadok's stage 75", 
+                 "Flag leaf greenness score at Zadok's stage 85", 
+                 "LAUG between Zadok's stage 65 and 75", 
+                 "LAUG between Zadok's stage 75 and 85"), 
+               c("lrt-dis-score", "lrt-greenness1", "lrt-greenness2", "lrt-greenness3", "lrt-laug1", "lrt-laug2")),
+     .f = function(x, y, z){knitr::kable(x, format = "latex", 
+                                         booktabs = TRUE, align = "l", 
+                                         caption = paste("\\label{tab:", z, "}", 
+                                                         'ANOVA table with likelihood ratio test for ', y, sep = "")) %>% 
+         kableExtra::kable_styling(latex_options = "HOLD_position") %>%
+         kableExtra::column_spec(1, width = "3.5cm") %>% 
+         print()
+     })
+```
+
+
+**Tables referenced in Chapter \@ref(modeling-plant-morphological-architectural-and-phenological-traits):**
+
+```{r echo = FALSE, results='asis', warning=FALSE, message=FALSE}
+
+other_models_compare <- pmap(list(model_other, model_other_1, model_other_2),
+     .f = function(x, y, z) anova(x, y, z) %>% 
+       broom::tidy() %>% 
+  mutate(term = c("Blocking factors", 
+                  "Blocking factors + Entry genotypes", 
+                  "Blocking factors + Check and entry genotypes"))) 
+
+pwalk(.l = list(other_models_compare, 
+                c("Plant height", 
+                  "Flag leaf surface area", 
+                  "SPAD at Zadok's stage 65", 
+                  "SPAD at Zadok's stage 75", 
+                  "Canopy temperature depression (CTD)", 
+                  "Days to heading", 
+                  "Days to anthesis"), 
+                c("lrt-plht", "lrt-lar", 
+                  "lrt-spadi", "lrt-spadii", 
+                  "lrt-ctd", "lrt-dth", "lrt-dta")),
+      .f = function(x, y, z){knitr::kable(x, format = "latex", 
+                                          booktabs = TRUE, align = "l", 
+                                          caption = paste("\\label{tab:", z, "}", 
+                                                          'ANOVA table with likelihood ratio test for ', y, sep = "")) %>% 
+          kableExtra::kable_styling(latex_options = "HOLD_position") %>%
+          kableExtra::column_spec(1, width = "3.5cm") %>% 
+          print()
+      })
+```
+
+
+# II
+
+\textbf{Snapshot of all statistical packages and processing environment used in analysis and interpretation of data:}
+
+```{r echo=FALSE}
+sessionInfo()
+```
+

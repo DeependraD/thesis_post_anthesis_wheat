@@ -1,0 +1,2 @@
+\setlength{\baselineskip}{1.5\baselineskip}
+I dedicate this dissertation to my parents, who provided me the opportunity to further my pursuit of knowledge, and to my lovely sister, who has always cheered me up, even at desperate times.

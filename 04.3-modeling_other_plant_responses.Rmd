@@ -1,0 +1,704 @@
+
+```{r model-other-setup, include=FALSE}
+knitr::opts_chunk$set(tidy = TRUE, cache = TRUE, 
+                      echo = FALSE, 
+                      tidy.opts = list(width.cutoff=50), 
+                      eval = TRUE, fig.pos = "H",
+                      fig.align = "center", 
+                      fig.asp = 0.7)
+options(knitr.kable.NA = "", digits = 3)
+```
+
+
+## Modeling plant morphological, architectural and phenological traits
+
+```{r other-model, eval=TRUE}
+other <- c("Plant height", "Flag leaf area", "SPADI (Zadok's stage 65)", "SPADII (Zadok's stage 85)", "Canopy temperature depression (CTD)", "Days to heading", "Days to anthesis")
+
+# # # Fixed effects checks and random intercept effects fit for line genotypes and design factors
+# model_other <- purrr::map(.x = c("plht", "lar",
+#                                        "chl_ind1_2", "chl_ind2_2", "ctd",
+#                                        "days_to_head", "days_to_anth"), 
+#                           .f = ~ lme4::lmer(get(.x) ~ 
+#                             (1 | rowgroup) +
+#                             (1 | colgroup) +
+#                             (1 | row:rowgroup) +
+#                             (1 | col:colgroup) +
+#                             (1 | interaction_rc) +
+#                             (1 | line_or_check) + check_or_line, # correct model
+#                             # (1 | line_or_check:conv) + check_or_line, # same as above
+#                             # (1 | line_or_check:conv) + check_or_line + conf + # rank deficient
+#                             # (1 | line_or_check:conv) + check_or_line:conf + conf + # rank deficient
+#                           data = all_data)) %>% 
+#   set_names(nm = other)
+# save(list = "model_other", 
+#      file = "04.3-modeling_other1.RData", 
+#      envir = .GlobalEnv)
+
+load("04.3-modeling_other1.RData")
+```
+
+
+<!-- ### Visualization of plant morphological, architectural and phenological traits -->
+
+<!-- ```{r other-viz1, fig.cap="Plant morphological and architectural traits versus superimposed blocks factor", fig.subcap=c("Plant height", "Flag leaf surface area"), fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold"} -->
+
+<!-- all_data[, "plht"] %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup),  -->
+<!--                         y = .x), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab("Plant height"))) # for multiple plots use `paste` -->
+
+<!-- all_data[, "lar"] %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup), # block -->
+<!--                         y = .x), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab("Flag leaf surface area"))) -->
+
+<!-- ``` -->
+
+
+<!-- ```{r other-viz2, fig.cap="Plant morphological and architectural traits versus superimposed blocks factor (...continued)", fig.subcap=c(paste("Leaf chlorophyll content at Zadok's stage", c(65, 85), "expressed as SPAD"), "Canopy temperature depression (CTD)"), fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold"} -->
+
+<!-- all_data[,c("chl_ind1_2", "chl_ind2_2")] %>%  -->
+<!--   walk2(.y = rep("Leaf chlorophyll content (SPAD)", times = 2),  -->
+<!--         .f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup),  -->
+<!--                         y = .x), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab(.y))) # for multiple plots use `paste` -->
+
+<!-- all_data[, "ctd"] %>%  -->
+<!--   walk(.f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup), # block -->
+<!--                         y = .x), data = all_data) +  -->
+<!--         geom_point(na.rm = TRUE) +  -->
+<!--         xlab("Block") +  -->
+<!--         ylab("Canopy temperature depression (CTD)"))) -->
+
+<!-- ``` -->
+
+
+<!-- ```{r other-viz3, fig.cap="Plant morphological and architectural traits versus superimposed blocks factor (...continued)", fig.subcap=c("Days to heading", "Days to anthesis"), fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold"} -->
+
+<!-- all_data %>%  -->
+<!--   select(days_to_head, days_to_anth) %>%  -->
+<!--   walk2(.y = c("Days to heading", "Days to anthesis"),  -->
+<!--         .f = ~ print(ggplot(aes(x = interaction(rowgroup, colgroup),  -->
+<!--                                 y = .x), data = all_data) +  -->
+<!--                        geom_point(na.rm = TRUE) +  -->
+<!--                        xlab("Block") +  -->
+<!--                        ylab(.y))) # for multiple plots use `paste` -->
+
+<!-- ``` -->
+
+### Model estimates of plant morphological, architectural and phenological traits
+
+```{r other-fitted-vs-observed-tab, results = "asis", eval=TRUE, echo=FALSE}
+
+# # BLUPs/fitted values
+fitted_other <- map2(.x = model_other, .y = c("plht", "lar",
+                                       "chl_ind1_2", "chl_ind2_2", "ctd",
+                                       "days_to_head", "days_to_anth"), 
+     ~ predict(.x) %>% 
+       enframe(name = "Genotype", value = paste(.y, "fitted")))
+
+# # tidying BLUPs
+fitted_other <- full_join(fitted_other[[1]], fitted_other[[2]], by = "Genotype") %>% 
+  full_join(fitted_other[[3]], by = "Genotype") %>% 
+  full_join(fitted_other[[4]], by = "Genotype") %>% 
+  full_join(fitted_other[[5]], by = "Genotype") %>% 
+  full_join(fitted_other[[6]], by = "Genotype") %>% 
+  full_join(fitted_other[[7]], by = "Genotype") %>% 
+  mutate(Genotype = as.numeric(Genotype)) %>% 
+  arrange(Genotype)
+
+# fitted_fixed <- all_data %>%
+#   transmute(row, col, 
+#             rowgroup, colgroup, 
+#             plot, lin_check, plht, lar, 
+#             chl_ind1_2, chl_ind2_2, ctd, 
+#             days_to_head, days_to_anth) %>% 
+#   bind_cols(fitted_fixed)
+
+fitted_other_split <- all_data %>% 
+  select(Genotype, 
+         `encoding` = `lin_check`, 
+         `Plant height` = `plht`, 
+         `Leaf area` = `lar`, 
+         `SPADI` = `chl_ind1_2`, 
+         `SPADII` = `chl_ind2_2`, 
+         `CTD` = `ctd`, 
+         `Days to heading` = `days_to_head`, 
+         `Days to anthesis` = `days_to_anth`) %>% 
+  group_by(encoding, Genotype) %>%
+  summarise_if(is.numeric, function(x)mean(x, na.rm = TRUE)) %>%
+  ungroup() 
+
+fitted_other_split[,c(1:6)] %>%
+  knitr::kable(format = "latex", 
+               caption = "Model adjusted genotypic mean responses of plant's morphological, architectural and phenological traits", 
+               booktabs = T, linesep = "", 
+               align = "c", 
+               longtable = TRUE) %>% 
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position", "repeat_header"),
+                            full_width = FALSE, font_size = 8) %>%
+  kableExtra::column_spec(column = 1, width = "1.65cm") %>% 
+  kableExtra::column_spec(column = 2, width = "4.8cm") %>% 
+  kableExtra::column_spec(column = 3:6, width = "1.8cm") %>% 
+  kableExtra::landscape()
+
+cat("\\clearpage")
+cat("\\addtocounter{table}{-1}")
+
+fitted_other_split[,c(1,2,7:9)] %>%
+  knitr::kable(format = "latex", 
+               caption = "Model adjusted genotypic mean responses of plant's morphological, architectural and phenological traits (...continued)", 
+               booktabs = T, linesep = "", 
+               align = "c", 
+               longtable = TRUE) %>% 
+  kableExtra::kable_styling(position = "center",
+                            latex_options = c("HOLD_position", "repeat_header"),
+                            full_width = FALSE, font_size = 8) %>%
+  kableExtra::column_spec(column = 1, width = "1.8cm") %>% 
+  kableExtra::column_spec(column = 2, width = "5.1cm") %>% 
+  kableExtra::column_spec(column = 3:5, width = "2.1cm") %>% 
+  kableExtra::landscape()
+
+```
+
+
+\blandscape
+
+### Mixed model summary of fixed effects terms of plant morphological, architectural and phenological traits
+
+```{r other-model-summary-tab, results="asis", echo=FALSE}
+
+# # must use this function with float=FALSE in stargazer
+long_stargazer <- function(...){
+  output <- capture.output(stargazer::stargazer(...))
+  # The lines 4 and second last lines are the ones we want to remove...
+  output[c(4, length(output)-1)] <- output[c(4, length(output)-1)] %>% 
+    stringr::str_replace("tabular", "longtable")
+  # cat out the results - this is essentially just what stargazer does too
+  cat(paste(output, collapse = "\n"), "\n")
+}
+
+long_stargazer(model_other[1:5], type = "latex", 
+               title = "Fixed effects model summary of plant morphological and architectural traits", 
+               style = "all", digits = 2, 
+               header = FALSE, font.size = "footnotesize", 
+               column.labels = c("\\parbox[t]{2.5cm}{Plant height}", 
+                                 "\\parbox[t]{2.5cm}{Leaf area}", 
+                                 "\\parbox[t]{2.5cm}{SPAD I}", 
+                                 "\\parbox[t]{2.5cm}{SPAD II}", 
+                                 "\\parbox[t]{2.5cm}{Canopy temperature depression (CTD)}"), 
+               model.names = TRUE, dep.var.labels.include = FALSE,
+               keep = c("check_or_line\\d", "Constant"), report = "vc*sp",
+               covariate.labels = c("Bhrikuti", "Gautam", 
+                                    "Tilottama", "Aditaya (Constant)"),
+               df = FALSE, omit.stat = c("adj.rsq"), single.row = TRUE, 
+               column.sep.width = "1pt", float = FALSE)
+
+long_stargazer(model_other[6:7], type = "latex", 
+               title = "Fixed effects model summary of plant phenological traits", 
+               style = "all", 
+               digits = 2, 
+               header = FALSE, 
+               font.size = "small", 
+               column.labels = c("\\parbox[t]{2.5cm}{Days to heading}", 
+                                 "\\parbox[t]{2.5cm}{Days to anthesis}"), 
+               model.names = TRUE, dep.var.labels.include = FALSE,
+               keep = c("check_or_line\\d", "Constant"), report = "vc*sp",
+               covariate.labels = c("Bhrikuti", "Gautam", 
+                                    "Tilottama", "Aditaya (Constant)"),
+               df = FALSE, omit.stat = c("adj.rsq"), single.row = TRUE, 
+               column.sep.width = "1pt", float = FALSE)
+```
+
+
+\elandscape
+
+<!-- ### ANOVA table of fixed effects terms of plant's morphological, architectural and phenological traits -->
+
+<!-- ```{r other-anova-tabs, eval=TRUE, echo=FALSE, results='asis'} -->
+<!-- # # if ANOVA tables are to be printed, changing attribute called "heading" would generate tables with correct names of repsonses. -->
+
+<!-- # # automated attribute changing generates new list, gotta assign to object -->
+<!-- anova_other <- pmap(list(model_other, other),  -->
+<!--                     .f = function(x, y) {x <- anova(x);  -->
+<!--                       attr(x, which = "heading") <- paste("ANOVA of response variable ", y, sep = "");  -->
+<!--                       return(x)}) -->
+
+<!-- walk2(.x = anova_other,  -->
+<!--       .y = other,  -->
+<!--       ~ print(.x %>% -->
+<!--         knitr::kable(format = "latex",  -->
+<!--                      caption = .y,  -->
+<!--                      booktabs = T, linesep = "",  -->
+<!--                      align = "c") %>%  -->
+<!--         kableExtra::kable_styling(position = "center", -->
+<!--                                   latex_options = c("HOLD_position"), -->
+<!--                                   full_width = FALSE) %>% -->
+<!--         kableExtra::column_spec(column = 0, bold = TRUE))) -->
+<!-- ``` -->
+
+#### Plant height
+
+Highly significant difference exist among the genotypes for Plant height trait based on the significane of LRT using $\chi^2$ statistic ($59.5$ with $4\ df$).
+
+A pairwise contrast of fixed effects estimate shows that all check varieties differ from one another except for Aditya (mean: $103.00\ cm\ (\pm\ 1.4)$) and Gautam (which are similar at 0.05 level of significance), implying that plant height is an important trait to differentiate the genotypes (indicated by a p-value of less than 0.01). With an average height of $94.53\ cm\ (\pm\ 1.4)$, Bhrikuti is the shortest variety. Likewise, the tallest variety (Gautam) has the mean height of $102.86\ cm\ (\pm\ 1.41)$.
+
+Meanwhile, random effects estimates for entry genotype levels do not show as much of difference. Also, the non-significance of LRT comparing models with and without random terms for entry genotypes clearly indicates that no relationship exists between plant height and entry genotypes. ANOVA table (\@ref(tab:lrt-plht)) and the dotplot (Figure \@ref(fig:other-dotplot11)) showing random effects estimates of the entry genotypes illustrate the relationship. 
+
+However, blocking factors -- row nested within rowgroup and superimposed blocks arising from the intersection between rowgroup and colgroup -- have contributed significantly to the variation in plant height.
+
+```{r other-meanconf-tab1, results='asis'}
+# Produces Differences of Least Squares Means (population means) table with p-values and Confidence intervals.
+other_diffmean <- map(.x = model_other, 
+                      .f = ~ lmerTest::difflsmeans(as_lmerModLmerTest(.x), adjust = "tukey") %>% 
+                        as_tibble(rownames = "Contrast"))
+
+other_diffmean[[1]] %>% 
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>% 
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>% 
+  knitr::kable(format = "latex", digits = 3, 
+               caption = "Mean differences in Plant height of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Flag leaf surface area
+
+No significant difference exist among the genotypes for Flag leaf surface area trait based on the non significance of LRT using $\chi^2$ statistic (ANOVA Table \@ref(tab:lrt-lar)). 
+
+A pairwise contrast of fixed effects estimate however reveals that check varieties Gautam (mean: $41.0\ cm^2\ (\pm\ 1.81)$) and Tilottama (mean: $36.0\ cm^2\ (\pm\ 1.80)$) had different flag leaf surface area, indicated by a p-value of less than 0.05.
+
+However, effect of blocking factor -- row nested within rowgroup -- can be confirmed as signifcant source of environmental variability in the flag leaf area trait (based on LRT).
+
+```{r other-meanconf-tab2, results='asis'}
+other_diffmean[[2]] %>% 
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>% 
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>% 
+  knitr::kable(format = "latex", digits = 3,
+               caption = "Mean differences in Flag leaf area of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### SPAD at Zadok's stage 65
+
+No significant difference exist among the genotypes SPAD measurement at Zadok's stage 65 based on the non significance of LRT using $\chi^2$ statistic. However, the test statistic of 8.95 at 4 df indicates that the hypotheis of no-difference do not hold at $10\%$ level of significance. 
+
+A pairwise contrast of fixed effects estimate, however, reveals that check variety Aditya has a higher mean SPAD value ($45.90\ (\pm\ 2.73)$) than both check varieties Bhrikuti and Tilottama. The variety with the lowest relative chlorophyll content at the given stage is Bhrikuti ($44.20\ (\pm\ 2.73)$).
+
+Likewise, highly variable estimates of random effects (Shown in \@ref(fig:other-dotplot13)) along with significance of LRT (Shown in \@ref(tab:lrt-spadi)) indicates that the entry genotypes vary to a large extent in the leaf chlorophyll content, early in the reproductive phase of the crop.
+
+Meanwhile, blocking factors do not have significant effects associated with the trait at the reference level of significance ($\alpha=0.05$).
+
+```{r other-meanconf-tab3, results='asis'}
+other_diffmean[[3]] %>% 
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>% 
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>% 
+  knitr::kable(format = "latex", digits = 3, 
+               caption = "Mean differences in SPADI (Zadok's stage 65) of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### SPAD at Zadok's stage 85
+
+LRT of mixed models using $\chi^2$ statistic show that highly significant differences exist among the genotypes for the SPAD measured at Zadok's stage 85. 
+
+A pairwise contrast of fixed effects estimate, however, reveals that check variety Aditya ($38.80\ (\pm\ 1.37)$) has the higher mean SPAD values in comparison to check varieties Bhrikuti and Tilottama, although no significant difference exist between the most chlorophyll preserved variety (Aditya) and the Gautam. Similarly, the mean comparison also shows that check variety Gautam also has higher relative chlorophyll content than other two check varieties. The lowest mean SPAD values was recorded for Tilottama ($32.35\ (\pm\ 1.37)$) the given stage.
+
+In contrast, the entry genotypes do not present as much a variation as check cultivars do among each other for SPAD measurement at latter stage of growth. This is evident from LRT test shown in \@ref(tab:lrt-spadii) and also random effects estimate of the entry genotypes (Shown in \@ref(fig:other-dotplot14)). Similarly, blocking factors do not present an attributable source of variation for the trait.
+
+```{r other-meanconf-tab4, results='asis'}
+other_diffmean[[4]] %>% 
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>% 
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>% 
+  knitr::kable(format = "latex", digits = 3, 
+               caption = "Mean differences in SPADII (Zadok's stage 85) of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Canopy temperature depression (CTD)
+
+LRT of mixed models using $\chi^2$ statistic show that genotypes have significant differences for the crop architecture trait Canopy temperature depression (CTD) measured near anthesis stage.
+
+Pairwise comparison, using Tukey procedure, of fixed effects estimate shows that canopy structure of check variety Bhrikuti favors greater reduction in temperature than check variety Aditya ($9.08^\circ C\ (\pm\ 0.79)$). Other varieties were at par with both of the check varieties. The
+
+In contrast, the entry genotypes do not present attributable variation in CTD. This is evident from LRT test shown in \@ref(tab:lrt-ctd) and also the variance components decomposition of random effects terms, which shows no heritable variation is found among the tested entries. 
+
+Although, multiple blocking factors, comprising effects of row group, nested effects of columns within column group and the effects of superimposed blocks arising from the intersection of individual row group and column group are found significantly high for the variation in canopy temperature depression trait.
+
+```{r other-meanconf-tab5, results='asis'}
+other_diffmean[[5]] %>% 
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>% 
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>% 
+  knitr::kable(format = "latex", digits = 3, 
+               caption = "Mean differences in CTD of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Days to heading
+
+Highly significant difference exists among the genotypes for days to heading trait based on the significane of LRT using $\chi^2$ statistic (155 with 4 degrees of freedom).
+
+Pairwise comparison of fixed effects estimate shows that all check varieties differ from one another except for Aditya (late heading type) (with mean of $67.79\ (\pm\ 2.40)$ days) and Gautam, which require similar Days for heading. Mean number of days taken for head to develop in half of the population was lowest in Tilottama ($62.71\ (\pm\ 2.40)$ days) variety.
+
+Similarly, random effects estimates for entry genotype levels also exhibit high variation for the trait, thereby indicating that significant proportion of the variation is heritable. ANOVA table (\@ref(tab:lrt-dth)) and the dotplot (Figure \@ref(fig:other-dotplot22)) showing random effects estimates of the entry genotypes illustrate the relationship. Amongst blocking factors, the effect of grouping the experimental units in rowgroups has relevance in reducing extraneous source of variability carried to the trait in the field.
+
+```{r other-meanconf-tab6, results='asis'}
+other_diffmean[[6]] %>% 
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>% 
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>% 
+  knitr::kable(format = "latex", digits = 3, 
+               caption = "Mean differences in Days to heading of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+```
+
+
+#### Days to anthesis
+
+Highly significant difference exists among the genotypes for Number of days to anthesis trait based on the significane of LRT using $\chi^2$ statistic ($85.8$ with $4\ df$).
+
+Pairwise comparison of fixed effects estimate shows that all check varieties differ from one another, with longest period to anthesis being that of check variety Aditya ($76.30\ (\pm\ 3.10)$ days) and the earliest flowering cultivar being Tilottama with an average of $71.7\ (\pm\ 0.46)$ days.
+
+Similarly, entry genotype also have a considerable genotypic variation which is reflected in a large measure of variance in random effects term. ANOVA table (\@ref(tab:lrt-dta)) and the dotplot (Figure \@ref(fig:other-dotplot23)) showing random effects estimates of the entry genotypes illustrate the relationship. Likewise, the effects of rowgroup and colgroup, contributing significantly to the variation in trait, may be safely substracted for obtaining better effects estimates of the entry genotypes. 
+
+```{r cor-graph-barplot-viz-checks, fig.cap="Number of checks at different growth stages at February 2", fig.asp=0.6, out.width="0.80\\linewidth"}
+
+all_data %>%
+  mutate_at("lin_check", function(x)fct_recode(x, "Aditya" = "1", "Bhrikuti" = "2", 
+                                               "Gautam" = "3", "Tilottama" = "4")) %>% 
+  filter(lin_check %in% c("Aditya", "Bhrikuti", "Gautam", "Tilottama")) %>% 
+  droplevels.data.frame() %>% 
+  select(lin_check, Feb_02_2017) %>% 
+  mutate_at(vars(Feb_02_2017), function(x)case_when(
+    x %in% fact_enc[which(fact_enc < "Spikes appearing")] ~ "Booting", 
+    x %in% fact_enc[which(fact_enc >= "Spikes appearing" & fact_enc <= "Spikes have fully emerged plus")] ~ "Spike emergence",
+    x %in% fact_enc[which(fact_enc >= "Anthesis stage I minus" & fact_enc <= "Anthesis advanced plus")] ~ "Anthesis",
+    x %in% fact_enc[which(fact_enc > "Anthesis advanced plus")] ~ "Post anthesis",
+    TRUE ~ as.character(x)
+  )) %>% 
+  table() %>%
+  as.tibble() %>% 
+  # spread(key = Feb_02_2017, value = n) %>%
+  ggplot(aes(x = Feb_02_2017)) +
+  geom_col(aes(y = n, 
+               fill = lin_check), 
+           position = position_dodge(), width = 0.8) +
+  xlab("February 2") +
+  ylab("Frequency") +
+  theme(axis.text.x = element_text(angle = 45, size = 9, vjust = 0.6)) +
+  labs(fill = "Check varieties\n")
+  # coord_flip()
+```
+
+
+Frequency barplot of different stages of reproductive periods of growth in wheat (Figure \@ref(fig:cor-graph-barplot-viz-checks)) reaffirms that Tilottama variety flowers the earliest amongst the check varieties and Aditya reaches to the flowering relatively late.
+
+```{r other-meanconf-tab7, results='asis'}
+other_diffmean[[7]] %>% 
+  mutate(Contrast = str_replace_all(Contrast, "check_or_line", "")) %>% 
+  filter(!str_detect(Contrast, "line")) %>% 
+  mutate(Contrast = c("Aditya-Bhrikuti", "Aditya-Gautam", 
+                      "Aditya-Tilottama", "Bhrikuti-Gautam", 
+                      "Bhrikuti-Tilottama", "Gautam-Tilottama")) %>% 
+  knitr::kable(format = "latex", digits = 3, 
+               caption = "Mean differences in Days to anthesis of check varieties (post-hoc comparison using Tukey procedure)", 
+               booktabs = T, linesep = "", 
+                     align = "c") %>% 
+        kableExtra::kable_styling(position = "center",
+                                  latex_options = c("HOLD_position"),
+                                  full_width = FALSE) %>%
+        kableExtra::column_spec(column = 0, bold = TRUE)
+
+```
+
+
+<!-- ```{r other-meanconf-viz, fig.cap="Mean of plant morphological, architectural and phenological traits compared across check varieties for fixed effect estimates with grouped standard errors shown as error bars", fig.subcap=c("Plant height of check varieties", "Flag leaf area of check varieties", "SPAD at Zadok's stage 65 of check varieties", "SPAD at Zadok's stage 85 of check varieties", "Canopy temperature depression of check varieties"), fig.ncol = 2, fig.show="hold", out.width="0.48\\linewidth"} -->
+
+<!-- # # 95% manual confidence interval bars -->
+<!-- # manual_cin <- all_data %>%  -->
+<!-- #   select(check_or_line, plht) %>%  -->
+<!-- #   filter(!check_or_line == "line") %>%  -->
+<!-- #   ggplot(aes(check_or_line, plht)) + -->
+<!-- #   stat_summary(fun.y = "mean", geom = "bar",  -->
+<!-- #                position = position_dodge(0.8),  -->
+<!-- #                color = "grey70", fill = "skyblue",  -->
+<!-- #                width = 0.5) + -->
+<!-- #   stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.3) + -->
+<!-- #   labs(x = "Check variety", y = "Plant height") +  -->
+<!-- #   theme_bw() + -->
+<!-- #   theme(text = element_text(size = 14)) -->
+
+<!-- # error bars -->
+<!-- manual_ebar_data <- map(.x = c("plht", "lar", -->
+<!--                           "chl_ind1_2", "chl_ind2_2", "ctd", -->
+<!--                           "days_to_head", "days_to_anth"),  -->
+<!--                    .f = ~ all_data %>%  -->
+<!--                      select(check_or_line, .x) %>%  -->
+<!--                      group_by(check_or_line) %>% -->
+<!--                      summarise_at(.x, funs(avg = mean(., na.rm = TRUE),  -->
+<!--                                                sdev = sd(., na.rm = TRUE), rep = n())) %>% -->
+<!--                      ungroup() %>%  -->
+<!--                      mutate(lower_err = avg-(sdev/sqrt(rep)),  -->
+<!--                             upper_err = avg+(sdev/sqrt(rep))) %>%  -->
+<!--                      filter(!check_or_line == "line") %>% -->
+<!--                      mutate(check_or_line = factor(check_or_line,  -->
+<!--                                                    labels = c("Aditya", "Bhrikuti", "Gautam", "Tilottama")))) -->
+
+<!-- # this function takes: -->
+<!-- # x =  a list of dataframes containing -->
+<!-- # ... mean, frequency count and the standard error,  -->
+<!-- # y = a vector of characters to use pass as ylab(), -->
+<!-- # and returns for each element a corresponding barplot -->
+<!-- ggsd_plot <- function(x, y) { -->
+<!--   intern_ggsd_plot <- purrr::map2(.x = x,  -->
+<!--                           .y = y,  -->
+<!--                           .f  = ~ .x %>%  -->
+<!--                             ggplot2::ggplot(aes(x=check_or_line, y=avg,  -->
+<!--                                                 ymax=upper_err, ymin=lower_err,  -->
+<!--                                                 group=1)) + -->
+<!--                             ggplot2::geom_col(fill="lightblue",  -->
+<!--                                               color="grey70", width = 0.4) + -->
+<!--                             ggplot2::geom_errorbar(position = position_dodge(0.9), width = 0.3) + -->
+<!--                             ggplot2::labs(x = "Check variety", y = .y) +  -->
+<!--                             ggplot2::theme_bw() + -->
+<!--                             ggplot2::theme(text = element_text(size = 14))) -->
+<!--   return(intern_ggsd_plot %>% purrr::walk(print)) -->
+<!-- } -->
+
+<!-- ggsd_plot(manual_ebar_data[1:5], y = c("Plant height",  -->
+<!--                                        "Flag leaf area",  -->
+<!--                                        "SPAD at Zadok's stage 65",  -->
+<!--                                        "SPAD at Zadok's stage 85",  -->
+<!--                                        "Canopy temperature depression")) -->
+<!-- ``` -->
+
+
+<!-- ```{r other-meanconf-viz2, fig.cap="Mean of plant morphological, architectural and phenological traits compared across check varieties for fixed effect estimates with grouped standard errors shown as error bars (...continued)", fig.subcap = c("Days to heading of check varieties", "Days to anthesis of check varieties"), fig.ncol = 2, fig.show="hold", out.width="0.48\\linewidth"} -->
+
+<!-- ggsd_plot(manual_ebar_data[6:7], y = c("Days to heading",  -->
+<!--                                        "Days to anthesis")) -->
+<!-- ``` -->
+
+
+### Mean comparison of plant's morphological, architectural and phenological traits of entry genotypes
+
+```{r other-blup-viz, fig.cap="Scatterplot of observed versus BLUP values of plant morphological, architectural and phenological traits", fig.subcap=other[1:4], fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE, fig.asp=0.8}
+
+# obtain random effect intercepts and the summary of variance of fixed and random terms
+genotype_blups <- map2(.x = model_other[1:4], 
+                      .y = c("plht", "lar", "chl_ind1_2", 
+             "chl_ind2_2"),
+                      .f = ~ lme4::ranef(.x) %>% 
+                        purrr::pluck(1) %>% 
+                        rownames_to_column(var = "Entry genotype") %>% 
+                        rename_at(2, ~ "BLUP") %>% 
+                        filter(!`Entry genotype` == "check") %>% 
+                        left_join(all_data %>% 
+                                    select(lin_check, is_line, .y) %>% 
+                                    filter(is_line == "1", !(is.na(get(.y)))) %>% 
+                                    select(-is_line), by = c("Entry genotype"="lin_check")))
+
+walk2(.x = genotype_blups,
+      .y = c("Plant height", "Flag leaf area", "SPADI", 
+             "SPADII"),
+      .f = ~  (ggplot(aes(x = BLUP, y = .x[,3]), data = .x) +
+                 geom_point() + ylab(.y)) %>% print())
+
+```
+
+
+Scatterplot showing observed means of plant's morphological, phenological and architectural traits plotted against their respective genotypic BLUP values is presented in Figure \@ref(fig:other-blup-viz).
+
+```{r other-fitted-obs-cor}
+
+mean_other_fitted <- fitted_other %>% 
+  select(-`Genotype`)
+
+mean_other_observed <- all_data %>% 
+  select(c("plht", "lar",
+           "chl_ind1_2", "chl_ind2_2", "ctd",
+           "days_to_head", "days_to_anth"))
+
+randdet <- map2_dbl(.x = mean_other_fitted, 
+                    .y = mean_other_observed,
+                    .f = ~ (cor(unclass(.x), unclass(.y), 
+                                use = "pairwise.complete.obs"))^2)
+```
+
+
+The coefficient of determination, as computed by squared correlation coefficient between the observed and fitted values of random effects model are `r randdet %>% round(digits = 2) %>% paste(collapse = ", ")`, respectively for the Plant height, Flag leaf area, SPAD at Zadok's stage 65, SPAD at Zadok's stage 85, Canopy temperature depression, Days to heading and Days to anthesis.
+
+```{r other-blup-viz2, fig.cap="Scatterplot of observed versus BLUP values of plant's morphological, architectural and phenological traits (...continued)", fig.subcap=other[5:7], fig.keep='all', fig.width=4, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE, fig.asp=0.8}
+
+# obtain random effect intercepts and the summary of variance of fixed and random terms
+genotype_blups <- map2(.x = model_other[5:7], 
+                      .y = c("ctd", "days_to_head", "days_to_anth"),
+                      .f = ~ lme4::ranef(.x) %>% 
+                        purrr::pluck(1) %>% 
+                        rownames_to_column(var = "Entry genotype") %>% 
+                        rename_at(2, ~ "BLUP") %>% 
+                        filter(!`Entry genotype` == "check") %>% 
+                        left_join(all_data %>% 
+                                    select(lin_check, is_line, .y) %>% 
+                                    filter(is_line == "1", !(is.na(get(.y)))) %>% 
+                                    select(-is_line), by = c("Entry genotype"="lin_check")))
+
+walk2(.x = genotype_blups,
+     .y = c("Canopy temperature depression", "Days to heading", "Days to anthesis"),
+    .f = ~  (ggplot(aes(x = BLUP, y = .x[,3]), data = .x) +
+      geom_point() + ylab(.y)) %>% print())
+
+```
+
+
+```{r other-dotplot1, fig.cap="Random effect estimates of plant's morphological, architectural and phenological traits of entry genotypes", fig.subcap=other[1:4], fig.keep='all', fig.width=7, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE, fig.asp=1.2}
+
+# remove_check_ranef <- function(x){
+#   y <- x;
+#   y$line_or_check <- y$line_or_check %>% 
+#     rownames_to_column("rn") %>% 
+#     slice(-1) %>% 
+#     column_to_rownames("rn") %>% 
+#     as.data.frame();
+#   return(y)
+# }
+
+random_effs <- map(.x = model_other[1:4], 
+                   .f = ~  ranef(.x, condVar = TRUE))
+qq <- map(.x = random_effs, 
+          .f = ~ attr(.x[[1]], "postVar")[-1])
+       
+df <- map2(.x = random_effs, 
+           .y = qq,
+           .f = ~ data.frame(Intercepts = .x$line_or_check[,1][-1], # remove first intercept ("Check")
+                        sd.intercept = 2*sqrt(.y[1:length(.y)]), 
+                        level_names = rownames(.x$line_or_check)[-1]) %>% 
+         mutate(level_p_shapes = as.factor(if_else(Intercepts>0, 1, 16)))) #scale_shape_manual point shapes (1 and 16)
+
+walk(.x = df, 
+     .f = ~ print(.x %>% 
+       ggplot(aes(level_names,Intercepts,shape=level_p_shapes)) +
+       geom_hline(yintercept=0) + # horizontal line
+       geom_errorbar(aes(ymin=Intercepts-sd.intercept, # error bars
+                         ymax=Intercepts+sd.intercept), width=0,color="black") + 
+       geom_point(aes(size=2)) + # point size 2
+       guides(size=FALSE,shape=FALSE) + # remove legends
+       # scale_shape_manual(values=rep(c(1,16), each = 34)) + # not necessary
+       theme_bw() +
+       xlab("Levels") + 
+       ylab("") +
+       theme(axis.text.x=element_text(size=rel(1.2)),
+             axis.title.x=element_text(size=rel(1.3)),
+             axis.text.y=element_text(size=rel(0.8)),
+             panel.grid.minor=element_blank(),
+             panel.grid.major.x=element_blank()) +
+       coord_flip())
+)
+```
+
+
+```{r other-dotplot2, fig.cap="Random effect estimates of plant's morphological, architectural and phenological traits of entry genotypes (...continued)", fig.subcap=other[5:7], fig.keep='all', fig.width=7, out.width='.48\\linewidth', cache=TRUE, eval=TRUE, echo=FALSE, fig.ncol = 2, fig.show="hold", warning=FALSE, message=FALSE, fig.asp=1.2}
+
+# remove_check_ranef <- function(x){
+#   y <- x;
+#   y$line_or_check <- y$line_or_check %>% 
+#     rownames_to_column("rn") %>% 
+#     slice(-1) %>% 
+#     column_to_rownames("rn") %>% 
+#     as.data.frame();
+#   return(y)
+# }
+
+random_effs <- map(.x = model_other[5:7], 
+                   .f = ~  ranef(.x, condVar = TRUE))
+qq <- map(.x = random_effs, 
+          .f = ~ attr(.x[[1]], "postVar")[-1])
+       
+df <- map2(.x = random_effs, 
+           .y = qq,
+           .f = ~ data.frame(Intercepts = .x$line_or_check[,1][-1], # remove first intercept ("Check")
+                        sd.intercept = 2*sqrt(.y[1:length(.y)]), 
+                        level_names = rownames(.x$line_or_check)[-1]) %>% 
+         mutate(level_p_shapes = as.factor(if_else(Intercepts>0, 1, 16)))) #scale_shape_manual point shapes (1 and 16)
+
+walk(.x = df, 
+     .f = ~ print(.x %>% 
+       ggplot(aes(level_names,Intercepts,shape=level_p_shapes)) +
+       geom_hline(yintercept=0) + # horizontal line
+       geom_errorbar(aes(ymin=Intercepts-sd.intercept, # error bars
+                         ymax=Intercepts+sd.intercept), width=0,color="black") + 
+       geom_point(aes(size=2)) + # point size 2
+       guides(size=FALSE,shape=FALSE) + # remove legends
+       # scale_shape_manual(values=rep(c(1,16), each = 34)) + # not necessary
+       theme_bw() +
+       xlab("Levels") + 
+       ylab("") +
+       theme(axis.text.x=element_text(size=rel(1.2)),
+             axis.title.x=element_text(size=rel(1.3)),
+             axis.text.y=element_text(size=rel(0.8)),
+             panel.grid.minor=element_blank(),
+             panel.grid.major.x=element_blank()) +
+       coord_flip())
+)
+```
+
+\clearpage
